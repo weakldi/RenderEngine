@@ -19,12 +19,20 @@ public class Plane extends Model{
 				new Vertex(-w/2, -h/2, 0, 0, 0, 1, 0, 0),
 				new Vertex(-w/2,  h/2, 0, 0, 0, 1, 0, 1),
 				new Vertex(w/2,   h/2, 0, 0, 0, 1, 1, 1),
-				new Vertex(w/2,  -h/2, 0, 0, 0, 1, 1, 0)
+				new Vertex(w/2,  -h/2, 0, 0, 0, 1, 1, 0),
+				
+				new Vertex(-w/2, -h/2, -0.01f, 0, 0, -1, 0, 0),
+				new Vertex(-w/2,  h/2, -0.01f, 0, 0, -1, 0, 1),
+				new Vertex(w/2,   h/2, -0.01f, 0, 0, -1, 1, 1),
+				new Vertex(w/2,  -h/2, -0.01f, 0, 0, -1, 1, 0)
 		};
 		
 		int[] ind = new int[]{
 			0,2,1,
-			2,0,3
+			2,0,3,
+			
+			4,5,6,
+			6,4,7
 		};
 		addVertices(vert);
 		addIndicies(ind);

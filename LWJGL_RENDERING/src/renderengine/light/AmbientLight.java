@@ -31,6 +31,7 @@ public class AmbientLight {
 		
 		m.bindModel();
 		for (Entity entity : e) {
+			entity.getTexture().bind();
 			AppHandler.ambientShader.loadColor(entity.getColor());
 			AppHandler.ambientShader.loadModelMat(entity.getTransFormationMatrix());
 			m.renderEntities();

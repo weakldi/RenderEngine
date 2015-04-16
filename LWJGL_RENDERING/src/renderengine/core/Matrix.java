@@ -67,6 +67,7 @@ public class Matrix {
 	public void rotate(float x,float y, float z,float rx,float ry,float rz){
 		translate(x, y, z);
 		rotate(rx, ry, rz);
+		translate(-x,-y,-z);
 	}
 	
 	public void translate(float x,float y,float z){

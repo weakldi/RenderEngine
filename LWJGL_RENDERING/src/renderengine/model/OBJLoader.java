@@ -27,7 +27,7 @@ public class OBJLoader {
 	private static List<Integer> ind = new ArrayList<>();
 	private static Map<Vertex, Integer> vertexMap = new HashMap<>();
 	private static int lastInd = 0;
-
+	private static String lastModelAsCode = "";
 	public static OBJModel loadOBJ(String file){
 		OBJModel m = new OBJModel();
 		String line = "";
@@ -73,8 +73,9 @@ public class OBJLoader {
 			m.delete();
 			m = null;
 			e.printStackTrace();
-		}		
+		}	
 		
+				
 		m.addVertices(VertexListToArray(vert));
 		m.addIndicies(intListToarray(ind));
 		vert.clear();
@@ -87,6 +88,78 @@ public class OBJLoader {
 		return m;
 	}
 	
+	public static String loadOBJToString(String file){
+		lastModelAsCode = "";
+		OBJModel m = new OBJModel();
+		String line = "";
+				try {
+			BufferedReader in = new BufferedReader(new FileReader(new File(file)));
+			while((line = in.readLine())!=null){
+				if(line.startsWith("v ")){
+					String[] coords = line.split(" ");
+					Vector3f vertex = new Vector3f(Float.valueOf(coords[1]), Float.valueOf(coords[2]), Float.valueOf(coords[3]));
+					vertPos.add(vertex);
+				}else if(line.startsWith("vt ")){
+					String[] uvs = line.split(" ");
+					Vector2f uv = new Vector2f(Float.valueOf(uvs[1]), Float.valueOf(uvs[2]));
+					vertUV.add(uv);
+ 				}else if(line.startsWith("vn ")){
+					String[] normalDir = line.split(" ");
+					Vector3f normal = new Vector3f(Float.valueOf(normalDir[1]), Float.valueOf(normalDir[2]), Float.valueOf(normalDir[3]));
+					vertNormal.add(normal);
+				}else if(line.startsWith("f ")){
+					String[] face = line.split(" ");
+					String[] vertexData1 = face[1].split("/");
+					String[] vertexData2 = face[2].split("/");
+					String[] vertexData3 = face[3].split("/");
+					
+					Vertex vertex1 = getVertex(vertexData1);
+					Vertex vertex2 = getVertex(vertexData2);
+					Vertex vertex3 = getVertex(vertexData3);
+					processVertex(vertex1);
+					processVertex(vertex2);
+					processVertex(vertex3);
+					
+				}
+			}
+			in.close();
+		} catch (IOException e) {
+			vert.clear();
+			vertexMap.clear();
+			vertNormal.clear();
+			vertPos.clear();
+			vertUV.clear();
+			ind.clear();
+			lastInd = 0;
+			m.delete();
+			m = null;
+			e.printStackTrace();
+		}	
+				lastModelAsCode = "Vertex[] vert = new Vertex["+vert.size()+"];\n";
+		int i = 0;
+		for (Vertex v : vert) {
+			lastModelAsCode+="vert["+(i)+"] = new Vertex(" + v.getVertexX() + "f, " + v.getVertexY() + "f, " + v.getVertexZ()  +"f, " + v.getVertexNormalX() + "f, " + v.getVertexNormalY() + "f, " + v.getVertexNormalZ() + "f, "
+					+ v.getVertexU() + "f, " + v.getVertexV() + "f);\n";
+			i++;
+		}
+		lastModelAsCode += "\nint[] ind = new int[]{\n";
+		for (Integer ind : ind) {
+			lastModelAsCode +="\t" + ind + ",\n";
+		}
+		lastModelAsCode +="};\n";
+				
+		
+		vert.clear();
+		vertexMap.clear();
+		vertNormal.clear();	
+		vertPos.clear();
+		vertUV.clear();
+		ind.clear();
+		lastInd = 0;
+		
+		return lastModelAsCode;
+	}
+	
 	private static void processVertex(Vertex v){
 		if(vertexMap.containsKey(v)){
 			ind.add(vertexMap.get(v));
@@ -96,6 +169,7 @@ public class OBJLoader {
 			vertexMap.put(v, lastInd);
 			lastInd++;
 		}
+		
 	}
 	
 	private static Vertex getVertex(String[] vertData){
@@ -126,6 +200,10 @@ public class OBJLoader {
 			iArray[i] = iList.get(i);
 		}
 		return iArray;
+	}
+
+	public static String getLastModelAsCode() {
+		return lastModelAsCode;
 	}
 
 }

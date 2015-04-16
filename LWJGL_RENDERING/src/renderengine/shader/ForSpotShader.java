@@ -112,7 +112,9 @@ public class ForSpotShader extends Shader{
 	}
 	
 	public void loadSpotDir(float dirX,float dirY,float dirZ){
-		loadUpVec3(spotDir_loc, new Vector3f(dirX, dirY, dirZ));
+		Vector3f vec = new Vector3f(dirX, dirY, dirZ);
+//		vec.normalise();
+		loadUpVec3(spotDir_loc, vec);
 	}
 	
 	public void loadDepthProjectionMatrix(Matrix mat){

@@ -50,6 +50,7 @@ public abstract class Efect {
 			AppHandler.mainApp.getRenderEngine().addEffect(this);
 	}
 	public void renderEfect(Texture target, Texture input){
+		preRender(input);
 		if(target == null){
 			Window.bindAsRenderTarget();
 			
@@ -59,12 +60,13 @@ public abstract class Efect {
 		}
 		GLUtil.setClearColor(0, 0, 0);
 		GLUtil.clearScreen();
-		preRender(input);
+		
 		if(input !=null)input.bind();
 		quad.bind();
 		GL11.glDrawArrays(GL11.GL_TRIANGLE_STRIP, 0, 4);
 		quad.unBind();
 		if(input !=null)input.unbind();
+		target.unbindFrambuffer();
 		afterReder();
 		
 	}

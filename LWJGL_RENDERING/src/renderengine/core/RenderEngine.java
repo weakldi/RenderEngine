@@ -1,6 +1,8 @@
 package renderengine.core;
 
 import static org.lwjgl.opengl.GL11.GL_BLEND;
+import static org.lwjgl.opengl.GL11.GL_FRONT;
+import static org.lwjgl.opengl.GL11.GL_LINE;
 import static org.lwjgl.opengl.GL30.*;
 import static org.lwjgl.opengl.GL20.*;
 import static org.lwjgl.opengl.GL15.*;
@@ -15,6 +17,10 @@ import java.util.List;
 
 
 
+
+
+
+import org.lwjgl.opengl.GL11;
 
 import renderengine.efects.BlurEfect;
 import renderengine.efects.Efect;
@@ -65,9 +71,11 @@ public class RenderEngine {
 		
 //		Window.bindAsRenderTarget();
 		texture1.bindAsRenderTarget();
-		GLUtil.setClearColor(0, 0, 0);
+		GLUtil.setClearColor(1, 1, 1);
 		GLUtil.clearScreen();
-		
+		GL11.glPolygonMode(GL_FRONT, GL_FILL);
+		glEnable(GL_CULL_FACE);
+		glCullFace(GL_BACK);
 		ambientLight.updateLight(cam);
 		for (Model model : models) {
 			ambientLight.renderModel(model,Models.getEntitys(model.getModelID()));
@@ -90,6 +98,7 @@ public class RenderEngine {
 		glDepthMask(true);
 		glDisable(GL_DEPTH_TEST);
 		glDisable(GL_BLEND);
+		GL11.glPolygonMode(GL_FRONT, GL_FILL);
 		boolean texture1asTarget = false;
 		for (Efect efect : efects) {
 			if (texture1asTarget) {

@@ -45,7 +45,7 @@ public class DiractionalLight extends Light{
 		shadowInfo.getShadowMap().bind(1);
 		model.bindModel();
 		for (Entity entity : e) {
-			
+			entity.getTexture().bind();
 			AppHandler.diractionalShader.loadColor(entity.getColor());
 			AppHandler.diractionalShader.loadModelMat(entity.getTransFormationMatrix());
 			

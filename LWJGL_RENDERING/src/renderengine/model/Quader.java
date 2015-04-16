@@ -18,57 +18,85 @@ public class Quader extends Model{
 	}
 	
 	private void initVAO(){
+		Vertex[] vert = new Vertex[36];
 		
-		Vertex f0 = new Vertex(-w/2, -h/2, -l/2,0,0,1,0,0);
-		Vertex f1 = new Vertex(-w/2, h/2, -l/2,0,0,1,0,1);
-		Vertex f2 = new Vertex(w/2, h/2, -l/2,0,0,1,1,1);
-		Vertex f3 = new Vertex(w/2, -h/2, -l/2,0,0,1,1,0);
-		
-		Vertex l0 = new Vertex(-w/2, -h/2, -l/2,1,0,0,0,0);
-		Vertex l1 = new Vertex(-w/2, -h/2, l/2,1,0,0,0,1);
-		Vertex l2 = new Vertex(-w/2, h/2, l/2,1,0,0,1,1);
-		Vertex l3 = new Vertex(-w/2, h/2, -l/2,1,0,0,1,0);
-		
-		Vertex u0 = new Vertex(-w/2, -h/2, -l/2,0,1,0,0,0);
-		Vertex u1 = new Vertex(-w/2, -h/2, l/2,0,1,0,0,1);
-		Vertex u2 = new Vertex(w/2, -h/2, l/2,0,1,0,1,1);
-		Vertex u3 = new Vertex(w/2, -h/2, -l/2,0,1,0,1,0);
-		
-		Vertex h0 = new Vertex(-w/2, -h/2, l/2,0,0,-1,0,0);
-		Vertex h1 = new Vertex(-w/2, h/2, l/2,0,0,-1,0,1);
-		Vertex h2 = new Vertex(w/2, h/2, l/2,0,0,-1,1,1);
-		Vertex h3 = new Vertex(w/2, -h/2, l/2,0,0,-1,1,0);
-		
-		Vertex r0 = new Vertex(w/2, -h/2, -l/2,1,0,0,0,0);
-		Vertex r1 = new Vertex(w/2, -h/2, l/2,1,0,0,0,1);
-		Vertex r2 = new Vertex(w/2, h/2, l/2,1,0,0,1,1);
-		Vertex r3 = new Vertex(w/2, h/2, -l/2,1,0,0,1,0);
-		
-		Vertex o0 = new Vertex(-w/2, h/2, -l/2,0,-1,0,0,0);
-		Vertex o1 = new Vertex(-w/2, h/2, l/2,0,-1,0,0,1);
-		Vertex o2 = new Vertex(w/2, h/2, l/2,0,-1,0,1,1);
-		Vertex o3 = new Vertex(w/2, h/2, -l/2,0,-1,0,1,0);
-		
-		Vertex[] vert = new Vertex[]{
-				f0,f1,f2,f3,
-				l0,l1,l2,l3,
-				u0,u1,u2,u3,
-				h0,h1,h2,h3,
-				r0,r1,r2,r3,
-				o0,o1,o2,o3
+		vert[0] = new Vertex(w/2f, -h/2f, l/2f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f);
+		vert[1] = new Vertex(-w/2f, -h/2f, l/2f, 0.0f, -1.0f, 0.0f, 1.0f, 1.0f);
+		vert[2] = new Vertex(-w/2f, -h/2f, -l/2f, 0.0f, -1.0f, 0.0f, 0.0f, 1.0f);
+		vert[3] = new Vertex(-w/2f, h/2f, -l/2f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f);
+		vert[4] = new Vertex(-w/2f, h/2f, l/2f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f);
+		vert[5] = new Vertex(w/2f, h/2f, l/2f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f);
+		vert[6] = new Vertex(w/2f, -h/2f, -l/2f, 1.0f, -0.0f, 0.0f, 0.0f, 0.0f);
+		vert[7] = new Vertex(w/2f, h/2f, -l/2f, 1.0f, -0.0f, 0.0f, 1.0f, 0.0f);
+		vert[8] = new Vertex(w/2f, h/2f, l/2f, 1.0f, -0.0f, 0.0f, 1.0f, 1.0f);
+		vert[9] = new Vertex(w/2f, -h/2f, l/2f, -0.0f, -0.0f, 1.0f, 0.0f, 0.0f);
+		vert[10] = new Vertex(w/2f, h/2f, l/2f, -0.0f, -0.0f, 1.0f, 1.0f, 0.0f);
+		vert[11] = new Vertex(-w/2f, h/2f, l/2f, -0.0f, -0.0f, 1.0f, 1.0f, 1.0f);
+		vert[12] = new Vertex(-w/2f, h/2f, l/2f, -1.0f, -0.0f, -0.0f, 1.0f, 0.0f);
+		vert[13] = new Vertex(-w/2f, h/2f, -l/2f, -1.0f, -0.0f, -0.0f, 1.0f, 1.0f);
+		vert[14] = new Vertex(-w/2f, -h/2f, -l/2f, -1.0f, -0.0f, -0.0f, 0.0f, 1.0f);
+		vert[15] = new Vertex(w/2f, -h/2f, -l/2f, 0.0f, 0.0f, -1.0f, 1.0f, 0.0f);
+		vert[16] = new Vertex(-w/2f, -h/2f, -l/2f, 0.0f, 0.0f, -1.0f, 1.0f, 1.0f);
+		vert[17] = new Vertex(-w/2f, h/2f, -l/2f, 0.0f, 0.0f, -1.0f, 0.0f, 1.0f);
+		vert[18] = new Vertex(w/2f, -h/2f, -l/2f, 0.0f, -1.0f, 0.0f, 0.0f, 0.0f);
+		vert[19] = new Vertex(w/2f, -h/2f, l/2f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f);
+		vert[20] = new Vertex(-w/2f, -h/2f, -l/2f, 0.0f, -1.0f, 0.0f, 0.0f, 1.0f);
+		vert[21] = new Vertex(w/2f, h/2f, -l/2f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f);
+		vert[22] = new Vertex(-w/2f, h/2f, -l/2f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f);
+		vert[23] = new Vertex(w/2f, h/2f, l/2f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f);
+		vert[24] = new Vertex(w/2f, -h/2f, l/2f, 1.0f, -0.0f, 0.0f, 0.0f, 1.0f);
+		vert[25] = new Vertex(w/2f, -h/2f, -l/2f, 1.0f, -0.0f, 0.0f, 0.0f, 0.0f);
+		vert[26] = new Vertex(w/2f, h/2f, l/2f, 1.0f, -0.0f, 0.0f, 1.0f, 1.0f);
+		vert[27] = new Vertex(-w/2f, -h/2f, l/2f, -0.0f, -0.0f, 1.0f, 0.0f, 1.0f);
+		vert[28] = new Vertex(w/2f, -h/2f, l/2f, -0.0f, -0.0f, 1.0f, 0.0f, 0.0f);
+		vert[29] = new Vertex(-w/2f, h/2f, l/2f, -0.0f, -0.0f, 1.0f, 1.0f, 1.0f);
+		vert[30] = new Vertex(-w/2f, -h/2f, l/2f, -1.0f, -0.0f, -0.0f, 0.0f, 0.0f);
+		vert[31] = new Vertex(-w/2f, h/2f, l/2f, -1.0f, -0.0f, -0.0f, 1.0f, 0.0f);
+		vert[32] = new Vertex(-w/2f, -h/2f, -l/2f, -1.0f, -0.0f, -0.0f, 0.0f, 1.0f);
+		vert[33] = new Vertex(w/2f, h/2f, -l/2f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f);
+		vert[34] = new Vertex(w/2f, -h/2f, -l/2f, 0.0f, 0.0f, -1.0f, 1.0f, 0.0f);
+		vert[35] = new Vertex(-w/2f, h/2f, -l/2f, 0.0f, 0.0f, -1.0f, 0.0f, 1.0f);
+		int[] ind = new int[]{
+			0,
+			1,
+			2,
+			3,
+			4,
+			5,
+			6,
+			7,
+			8,
+			9,
+			10,
+			11,
+			12,
+			13,
+			14,
+			15,
+			16,
+			17,
+			18,
+			19,
+			20,
+			21,
+			22,
+			23,
+			24,
+			25,
+			26,
+			27,
+			28,
+			29,
+			30,
+			31,
+			32,
+			33,
+			34,
+			35,
 		};
 		
-		int[] ind = new int[] {
-//				0,2,1,2,0,3,
-				4,6,5,6,4,7,
-//				8,10,9,10,8,11,
-//				12,14,13,14,12,15,
-//				16,18,17,18,16,19,
-//				20,22,21,22,21,24
-		};
 		addVertices(vert);
 		addIndicies(ind);
-		
 	}
 
 	public float getW() {

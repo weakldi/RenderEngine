@@ -1,5 +1,6 @@
 package renderengine.core;
 
+import renderengine.shader.BloomPassOneShader;
 import renderengine.shader.FXAAShader;
 import renderengine.shader.ForAmbientShader;
 import renderengine.shader.ForDiractionalShader;
@@ -8,6 +9,8 @@ import renderengine.shader.ForSpotShader;
 import renderengine.shader.GUIShader;
 import renderengine.shader.GUITextureAtlasShader;
 import renderengine.shader.GaussBlurShader;
+import renderengine.shader.GrayScaleShader;
+import renderengine.shader.MixShader;
 import renderengine.shader.ShadowMapShader;
 import renderengine.shader.SkyBoxShader;
 
@@ -23,4 +26,7 @@ public class AppHandler {
 	public static FXAAShader fxaaShader;
 	public static GaussBlurShader blurShader;
 	public static GUITextureAtlasShader textShader;
+	public static GrayScaleShader grayScale;
+	public static BloomPassOneShader bloomeOne;
+	public static MixShader mixShader;
 }

@@ -12,6 +12,8 @@ public class TwoPassBlur {
 		blurX = new BlurEfect(true, radius, 1, 0);
 		blurY = new BlurEfect(true, radius, 0, 1);
 	}
+	
+	
 
 	public float getRadius() {
 		return radius;

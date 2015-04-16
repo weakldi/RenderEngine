@@ -8,6 +8,7 @@ import renderengine.core.AppHandler;
 import renderengine.core.Camera;
 import renderengine.core.Color;
 import renderengine.core.Entity;
+import renderengine.core.Material;
 import renderengine.core.Window;
 import renderengine.model.Model;
 
@@ -57,8 +58,14 @@ public class SpotLight extends Light{
 		AppHandler.spotShader.loadCutoff(cutoff);
 		AppHandler.spotShader.loadSpotDir(dirX, dirY, dirZ);
 		AppHandler.spotShader.loadCamPos(cam.getX(), cam.getY(), cam.getZ());
-		AppHandler.spotShader.loadDepthViewMat(shadowInfo.getCam().getViewMatrix());
-		AppHandler.spotShader.loadDepthProjectionMatrix(shadowInfo.getCam().getProjectionMatrix());
+		if(shadowInfo!=null){
+			AppHandler.spotShader.loadDepthViewMat(shadowInfo.getCam().getViewMatrix());
+			AppHandler.spotShader.loadDepthProjectionMatrix(shadowInfo.getCam().getProjectionMatrix());
+		}else{
+			AppHandler.spotShader.loadDepthViewMat(cam.getViewMatrix());
+			AppHandler.spotShader.loadDepthProjectionMatrix(cam.getProjectionMatrix());
+		}
+		
 		AppHandler.spotShader.unbindShader();
 	}
 
@@ -66,9 +73,11 @@ public class SpotLight extends Light{
 	public void renderModel(Model model, List<Entity> e) {
 		AppHandler.spotShader.useShader();
 		
-		
-//		shadowInfo.getFinalShadowMap().bind(1);
-		shadowInfo.getShadowMap().bind(1);
+		if(shadowInfo!=null)
+			shadowInfo.getFinalShadowmap().bind(1);
+		else
+			Material.getBaseTexture().bind(1);
+//		shadowInfo.getShadowMap().bind(1);
 		model.bindModel();
 		for (Entity entity : e) {
 			entity.getTexture().bind(0);
@@ -79,7 +88,10 @@ public class SpotLight extends Light{
 			entity.getTexture().unbind();
 		}
 		model.unbindModel();
-		shadowInfo.getShadowMap().unbind();
+		if(shadowInfo!=null)
+			shadowInfo.getShadowMap().unbind();
+		else
+			Material.getBaseTexture().unbind();
 		AppHandler.spotShader.unbindShader();
 	}
 
@@ -103,7 +115,7 @@ public class SpotLight extends Light{
 			m.renderEntities();
 		}
 		m.unbindModel();
-		GL11.glCullFace(GL11.GL_BACK);
+		
 		AppHandler.shadowShader.unbindShader();
 	}
 	public float getAttenuationConst() {

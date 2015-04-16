@@ -11,6 +11,7 @@ import renderengine.light.AmbientLight;
 import renderengine.light.Light;
 import renderengine.model.Model;
 import renderengine.model.SkyBox;
+import renderengine.shader.BloomPassOneShader;
 import renderengine.shader.FXAAShader;
 import renderengine.shader.ForAmbientShader;
 import renderengine.shader.ForDiractionalShader;
@@ -19,6 +20,8 @@ import renderengine.shader.ForSpotShader;
 import renderengine.shader.GUIShader;
 import renderengine.shader.GUITextureAtlasShader;
 import renderengine.shader.GaussBlurShader;
+import renderengine.shader.GrayScaleShader;
+import renderengine.shader.MixShader;
 import renderengine.shader.ShadowMapShader;
 import renderengine.shader.SkyBoxShader;
 
@@ -61,10 +64,13 @@ public abstract class MainApplication {
 		AppHandler.skyShader = new SkyBoxShader();
 		AppHandler.shadowShader = new ShadowMapShader();
 		AppHandler.spotShader = new ForSpotShader();
-		AppHandler.guiShader= new GUIShader();
+		AppHandler.guiShader = new GUIShader();
 		AppHandler.fxaaShader = new FXAAShader();
 		AppHandler.blurShader = new GaussBlurShader();
 		AppHandler.textShader = new GUITextureAtlasShader();
+		AppHandler.grayScale = new GrayScaleShader();
+		AppHandler.bloomeOne = new BloomPassOneShader();
+		AppHandler.mixShader = new MixShader();
 		rootComponent = new GameComponent() {
 			
 			@Override
@@ -149,6 +155,9 @@ public abstract class MainApplication {
 		AppHandler.fxaaShader.deleteShader();
 		AppHandler.blurShader.deleteShader();
 		AppHandler.textShader.deleteShader();	
+		AppHandler.grayScale.deleteShader();
+		AppHandler.bloomeOne.deleteShader();
+		AppHandler.mixShader.deleteShader();
 		for (int i = 0; i < models.size(); i++) {
 			models.get(i).delete();
 		}

@@ -65,5 +65,17 @@ public class FlyCamera extends Camera{
 			
 			
 	}
+	public float getSpeed() {
+		return speed;
+	}
+	public void setSpeed(float speed) {
+		this.speed = speed;
+	}
+	public float getRotSpeed() {
+		return rotSpeed;
+	}
+	public void setRotSpeed(float rotSpeed) {
+		this.rotSpeed = rotSpeed;
+	}
 	
 }

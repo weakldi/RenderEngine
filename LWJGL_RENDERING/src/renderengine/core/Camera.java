@@ -2,7 +2,7 @@ package renderengine.core;
 
 
 import org.lwjgl.util.vector.Vector3f;
-
+import org.lwjgl.util.vector.Matrix4f;
 public class Camera {
 	
 	private float w,h;
@@ -49,15 +49,16 @@ public class Camera {
 		lookAt = false;
 	}
 	
-	public void lookAt(final Vector3f eye, final Vector3f center, final Vector3f up)
+	public void lookAt(final Vector3f eye, final Vector3f dir, final Vector3f up)
     {
 		
-        final Vector3f f = (Vector3f.sub(center, eye, null)).normalise(null);
+//        final Vector3f f = (Vector3f.sub(dir, eye, null)).normalise(null);
+		final Vector3f f = dir.normalise(null);
         final Vector3f upn = up.normalise(null); // <--
         final Vector3f s = (Vector3f.cross(f, upn, null)).normalise(null); // <--
         final Vector3f u = Vector3f.cross(s, f, null); // <--
  
-     
+     //System.out.println("s = " + s + " upn = " + upn + " f = " + f + " u = " + u + " up = " + up);
         view.getMatGL() .setZero();
  
         view.getMatGL() .m00 = s.x;
@@ -73,9 +74,52 @@ public class Camera {
         view.getMatGL() .m22 = -f.z;
  
         view.getMatGL() .m33 = 1; // <--
- 
+//        System.out.println(eye.z);
         view.getMatGL() .translate(new Vector3f(-eye.x, -eye.y, -eye.z));
-       
+//       
+		
+        	
+        	
+//        Vector3f right = new Vector3f();
+//        dir.normalise();
+//        System.out.println(dir + "\n" + up);
+//        Vector3f.cross(dir,up,right);
+//        System.out.println(right);
+//        right.normalise();
+//
+//        Vector3f.cross(right,dir,up);
+//        up.normalise();
+//
+//        Matrix4f aux = new Matrix4f();
+//
+//        view.getMatGL().m00 = right.getX();
+//        view.getMatGL().m01  = right.getY();
+//        view.getMatGL().m02 = right.getZ();
+//        view.getMatGL().m03 = 0.0f;
+//
+//        view.getMatGL().m10  = up.getX();
+//        view.getMatGL().m11  = up.getY();
+//        view.getMatGL().m12 = up.getZ();
+//        view.getMatGL().m13 = 0.0f;
+//
+//        view.getMatGL().m20 = -dir.getX();
+//        view.getMatGL().m21  = -dir.getY();
+//        view.getMatGL().m22 = -dir.getZ();
+//        view.getMatGL().m23 =  0.0f;
+//
+//        view.getMatGL().m30  = 0.0f;
+//        view.getMatGL().m31  = 0.0f;
+//        view.getMatGL().m32 = 0.0f;
+//        view.getMatGL().m33 = 1.0f;
+//
+//        //setup aux as a translation matrix by placing positions in the last column
+//        aux.m30 = -eye.getX();
+//        aux.m31 = -eye.getY();
+//        aux.m32 = -eye.getZ();
+//
+//        //multiplication(in fact translation) view.getMatGL() with aux
+//        Matrix4f.mul(view.getMatGL(), aux, view.getMatGL());
+
         lookAt = true;
     }
 	public void updateViewmat(){

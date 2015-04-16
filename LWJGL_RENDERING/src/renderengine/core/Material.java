@@ -59,6 +59,11 @@ public class Material {
 		this.texture = texture;
 	}
 	
-	
+	public static Texture getBaseTexture(){
+		if(baseTexture==null){
+			baseTexture = new Texture("res/textures/baseTexture.png",Texture.FILTER_NEAREST,false);
+		}
+		return baseTexture;
+	}
 	
 }

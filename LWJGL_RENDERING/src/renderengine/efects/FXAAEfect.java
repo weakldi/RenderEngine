@@ -6,7 +6,7 @@ import renderengine.texture.Texture;
 
 public class FXAAEfect extends Efect{
 	private boolean hasChanged = true;
-	private float spanMax = 1f;
+	private float spanMax = 10f;
 	private float reduceMul = 1.0f/8.0f;
 	private float reduceMin = 1.0f/128f;
 	public FXAAEfect(boolean finalRender) {
@@ -15,7 +15,6 @@ public class FXAAEfect extends Efect{
 	@Override
 	protected void afterReder() {
 		AppHandler.fxaaShader.unbindShader();
-		
 	}
 
 	@Override

@@ -29,12 +29,16 @@ float calcShadow(sampler2D shadowMap, vec4 shadowCoord){
 	vec3 shadowMapCoord = shadowCoord.xyz/shadowCoord.w ;
 	vec2 moments = texture2D(shadowMap,shadowMapCoord.xy).xy;
 	float p = step(shadowMapCoord.z ,moments.x);
+	// p = 1;
+	// if(shadowMapCoord.z > moments.x){
+		// p = 0.5;
+	// }
 	float variance = max(moments.y - moments.x * moments.x,0.00002);
 	
 	float d = shadowMapCoord.z - moments.x;
 	float pMax = linstep(0.2, 1.0, variance / (variance + d*d));
 	
-	//return min(max(p, pMax),1.0);
+	//return min(max(p,pMax),0.0);
 	return p;
 }
 
