@@ -12,6 +12,14 @@ public class Camera {
 	private boolean lookAt = false;
 	private Matrix projectionMatrix;
 	private boolean usedForWindow;
+	
+	/**
+	 * Erstelt eine neue Kamera mit der Weite w und der Höhe h fur die Projectionmatrix.
+	 * Die Variable usedForWindow wird benutzt um festzustellen ob die Kamera bei Veränderung der Displayauflösung upgedated werden soll (Projectionmatrix).
+	 * @param w
+	 * @param h
+	 * @param usedForWindow
+	 */
 	public Camera(float w,float h,boolean usedForWindow) {
 		this.w = w;
 		this.h = h;
@@ -20,7 +28,13 @@ public class Camera {
 		this.usedForWindow = usedForWindow;
 		AppHandler.mainApp.addCamera(this);
 	}
-	
+	/**
+	 * Erstelt eine neue Kamera mit der Weite w und der Höhe h fur die Projectionmatrix.
+	 * Standartmäsig wird die Kamera bei Veränderung der Displayauflösung upgedated.
+	 * @param w
+	 * @param h
+	 * @param usedForWindow
+	 */
 	public Camera(float w,float h){
 		this(w,h,true);
 	}

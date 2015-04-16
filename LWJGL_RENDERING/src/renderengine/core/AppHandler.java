@@ -13,7 +13,7 @@ import renderengine.shader.GrayScaleShader;
 import renderengine.shader.MixShader;
 import renderengine.shader.ShadowMapShader;
 import renderengine.shader.SkyBoxShader;
-
+//Besitzt Objekte von wichtigen Shadern und eine Instanz der Main-Klasse.
 public class AppHandler {
 	public static MainApplication mainApp;
 	public static ForAmbientShader ambientShader;
