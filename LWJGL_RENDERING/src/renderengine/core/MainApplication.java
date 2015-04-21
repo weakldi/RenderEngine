@@ -36,27 +36,31 @@ public abstract class MainApplication {
 	protected AmbientLight ambientLight;
 	protected SkyBox sky = null;
 	protected List<Camera> cams;
-	
+	private int w,h;
 	public GameComponent rootComponent;
 	
 	public MainApplication(){
 		this(800,600);
 	}
 	public MainApplication(int w,int h){
+		this.w = w;
+		this.h = h;
 		models = new ArrayList<Model>();
 		ambientLight = new AmbientLight();
 		lights = new ArrayList<>();
 		cams = new ArrayList<>();
 		run = false;
+	}
+	
+	private void init(){
+		
+		
 		NativeLoader.loadNatives();
 		Window.createWindow(w, h);
 		renderEngine = new RenderEngine();
 		
-		AppHandler.mainApp = this;
-	}
-	
-	private void init(){
 		GLUtil.initGL();
+		AppHandler.mainApp = this;
 		cam = new Camera(Window.getW(),Window.getH());
 		AppHandler.ambientShader = new ForAmbientShader();
 		AppHandler.diractionalShader = new ForDiractionalShader();
@@ -232,5 +236,17 @@ public abstract class MainApplication {
 
 	public void setLights(List<Light> lights) {
 		this.lights = lights;
+	}
+	public int getW() {
+		return w;
+	}
+	public void setW(int w) {
+		this.w = w;
+	}
+	public int getH() {
+		return h;
+	}
+	public void setH(int h) {
+		this.h = h;
 	}
 }

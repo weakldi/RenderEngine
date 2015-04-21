@@ -8,7 +8,7 @@ public class Camera {
 	private float w,h;
 	protected float x,y,z;
 	protected float rX,rY,rZ;
-	Matrix view ;
+	private Matrix view;
 	private boolean lookAt = false;
 	private Matrix projectionMatrix;
 	private boolean usedForWindow;

@@ -6,7 +6,7 @@ import renderengine.texture.Texture;
 public class BloomPassOneEffect extends Efect{
 	private float minBloomValue = 0.8f;
 	public BloomPassOneEffect() {
-		super(true);
+		super(false);
 		// TODO Auto-generated constructor stub
 	}
 

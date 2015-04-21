@@ -17,12 +17,14 @@ public class GLUtil {
 		glEnable(GL_DEPTH_CLAMP);
 		glCullFace(GL_BACK);
 		setClearColor(0, 0, 0);
-		
-		
 	}
 	
 	public static void setClearColor(float r, float g,float b){
 		glClearColor(r, g, b, 1);
+	}
+	
+	public static void setClearColor(Color c){
+		glClearColor(c.getR(), c.getG(), c.getB(), 1);
 	}
 	
 	public static void clearScreen(){

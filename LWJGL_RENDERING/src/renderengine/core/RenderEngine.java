@@ -35,51 +35,61 @@ import renderengine.model.SkyBox;
 import renderengine.texture.Texture;
 public class RenderEngine {
 	private GUIComponent root;
-	private BlurEfect blur;
-	private Texture texture1;
-	private Texture texture2;
+	private Texture buffer1;
+	private Texture buffer2;
 	private List<Efect> efects;
-	
 	public RenderEngine() {
 		root = new GUIComponent(true);
-		texture1 = new Texture(Window.getW(),Window.getH(),GL_COLOR_ATTACHMENT0,GL_LINEAR,false);
-		texture2 = new Texture(Window.getW(),Window.getH(),GL_COLOR_ATTACHMENT0,GL_LINEAR,false);
 		efects = new ArrayList<Efect>();
-//		blur = new BlurEfect(false,0.125f,1,0);
-		
+		//Die zwei Framebuffer erstellen, die für das postprocessing genutzt werden.
+		buffer1 = new Texture(Window.getW(),Window.getH(),GL_COLOR_ATTACHMENT0,GL_LINEAR,false);
+		buffer2 = new Texture(Window.getW(),Window.getH(),GL_COLOR_ATTACHMENT0,GL_LINEAR,false);
 	}
+	
+	/**
+	 * * Rendert die Szene durch aufrufen der Einzenen Schritte.<br>
+	 * 	1. Die Shadowmaps für die Lichter erstellen! (createShadowMaps)<br>
+	 * 	2. Die Szene in ein FrameBuffer rendern! (renderScene)<br>
+	 * 	3. Mit Postprocessing den frambuffer bearbeiten die GUI rendern! (finalRender)<br>
+	 * @param cam Die Kamera die für das rendern benutzt werden soll.
+	 * @param models Alle models die gerendert werden sollen
+	 * @param ambientLight das Ambielte licht
+	 * @param lights Alle anderen Lichter der Szene
+	 */
+	 
+	 
 	public void render(Camera cam,List<Model> models,AmbientLight ambientLight,List<Light> lights){
+		createShadowMaps(lights, models);
+		renderScene(cam, models, ambientLight, lights);
+		finalRender();
+	}
+	/**
+	 * Rendert die Szene mit Forwardrendering
+	 * @param cam Die Kamera die für das rendern benutzt werden soll.
+	 * @param models Alle models die gerendert werden sollen
+	 * @param ambientLight das Ambielte licht
+	 * @param lights Alle anderen Lichter der Szene
+	 */
+	 
+	 
+	private void renderScene(Camera cam,List<Model> models,AmbientLight ambientLight,List<Light> lights){
+		//Framebuffer binden.
+		buffer1.bindAsRenderTarget();
 		
-		glEnable(GL_DEPTH_TEST);
-		for (Light light : lights) {
-			
-			if(light.isEnabeld()){
-				if(light.getShadowInfo()!=null){
-					light.getShadowInfo().getShadowMap().bindAsRenderTarget();
-					for (Model model : models) {
-						GLUtil.setClearColor(1, 1, 0);
-						light.updateShadowInfo();
-						light.renderShadowMap(model,Models.getEntitys(model.getModelID()));
-					}
-					
-					light.getShadowInfo().getShadowMap().unbindFrambuffer();
-					
-				}
-			}
-		}
-		
-		
-//		Window.bindAsRenderTarget();
-		texture1.bindAsRenderTarget();
-		GLUtil.setClearColor(1, 1, 1);
+		//Den Framebuffer lehren und das Rendern Forbereiten
+		GLUtil.setClearColor(0, 0, 0);
 		GLUtil.clearScreen();
 		GL11.glPolygonMode(GL_FRONT, GL_FILL);
 		glEnable(GL_CULL_FACE);
 		glCullFace(GL_BACK);
+		//Szene mit ambienten Licht rendern darbei wird der Depthtest durchgeführt.
 		ambientLight.updateLight(cam);
 		for (Model model : models) {
 			ambientLight.renderModel(model,Models.getEntitys(model.getModelID()));
 		}
+		//Rendereinstellungen für die Lichter vorbereiten und nur Fragments mit gleichem Z-Wert wie im Depthbuffer rendern.
+		//Dies sorgt dafür, dass nur sichtbare flächen gerendert werden und somit viel zeit für die Lichtberechnung eingespart wird.
+		//Durch das addieren der neuen farbe auf den Ausgenswert wird das endgültige Bild erzeugt.
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_ONE, GL_ONE);
 		glDepthMask(false);
@@ -98,35 +108,11 @@ public class RenderEngine {
 		glDepthMask(true);
 		glDisable(GL_DEPTH_TEST);
 		glDisable(GL_BLEND);
-		GL11.glPolygonMode(GL_FRONT, GL_FILL);
-		boolean texture1asTarget = false;
-		for (Efect efect : efects) {
-			if (texture1asTarget) {
-				efect.renderEfect(texture1, texture2);
-			}else{
-				efect.renderEfect(texture2, texture1);
-			}
-			texture1asTarget = !texture1asTarget;
-		}
-		if(efects.size()==0){
-			root.setTexture(texture1);
-		}else if (texture1asTarget) {
-			root.setTexture(texture2);
-		}else{
-			root.setTexture(texture1);
-		}
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		Window.bindAsRenderTarget();
-		GLUtil.setClearColor(0, 0, 0);
-		GLUtil.clearScreen();
-		root.renderAll();
-		
-		
-		glDisable(GL_BLEND);
+		buffer1.unbindFrambuffer();
 		
 	}
-	Font f;
+	
+	
 	public void render(Camera cam,List<Model> models,AmbientLight ambientLight,List<Light> lights,SkyBox sky){
 		
 		
@@ -162,8 +148,60 @@ public class RenderEngine {
 	public void addEffect(Efect efect) {
 		efects.add(efect);
 	}
+	/**
+	 * 
+
+	 * @param models Alle models die gerendert werden sollen
+	 * @param lights Alle Lichter für die eine Shadowmap generriert werden soll
+	 */
+	private void createShadowMaps(List<Light> lights,List<Model> models){
+		glEnable(GL_DEPTH_TEST);
+		for (Light light : lights) {
+			
+			if(light.isEnabeld()){
+				if(light.getShadowInfo()!=null){
+					light.getShadowInfo().getShadowMap().bindAsRenderTarget();
+					for (Model model : models) {
+						GLUtil.setClearColor(1, 1, 0);
+						light.updateShadowInfo();
+						light.renderShadowMap(model,Models.getEntitys(model.getModelID()));
+					}
+					
+					light.getShadowInfo().getShadowMap().unbindFrambuffer();
+					
+				}
+			}
+		}
+	}
 	
-	
+	private void finalRender(){
+		GL11.glPolygonMode(GL_FRONT, GL_FILL);
+		boolean buffer1asTarget = false;
+		for (Efect efect : efects) {
+			if (buffer1asTarget) {
+				efect.renderEfect(buffer1, buffer2);
+			}else{
+				efect.renderEfect(buffer2, buffer1);
+			}
+			buffer1asTarget = !buffer1asTarget;
+		}
+		if(efects.size()==0){
+			root.setTexture(buffer1);
+		}else if (buffer1asTarget) {
+			root.setTexture(buffer2);
+		}else{
+			root.setTexture(buffer1);
+		}
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		Window.bindAsRenderTarget();
+		GLUtil.setClearColor(0, 0, 0);
+		GLUtil.clearScreen();
+		root.renderAll();
+		
+		
+		glDisable(GL_BLEND);
+	}
 	
 	
 }

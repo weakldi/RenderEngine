@@ -1,6 +1,11 @@
 package renderengine.test;
 
 
+import java.io.File;
+import java.io.IOException;
+
+import javax.imageio.ImageIO;
+
 import org.lwjgl.util.vector.Vector3f;
 
 import renderengine.core.Color;
@@ -8,6 +13,7 @@ import renderengine.core.Entity;
 import renderengine.core.FlyCamera;
 import renderengine.core.MainApplication;
 import renderengine.core.Transformation;
+import renderengine.efects.BloomEfect;
 import renderengine.efects.FXAAEfect;
 import renderengine.efects.GrayScaleEfect;
 import renderengine.gui.TextField;
@@ -15,8 +21,11 @@ import renderengine.input.Keyboard;
 import renderengine.input.Mouse;
 import renderengine.light.PointLight;
 import renderengine.light.SpotLight;
+import renderengine.model.Model;
+import renderengine.model.OBJLoader;
 import renderengine.model.Plane;
 import renderengine.model.Quader;
+import renderengine.model.Terrain;
 import renderengine.texture.Texture;
 
 public class TestShadowMap extends MainApplication{
@@ -52,23 +61,26 @@ public class TestShadowMap extends MainApplication{
 		protected void initApp() {
 			
 			s = new SpotLight(new Color(0.25f,0.25f,0.25f),-40,3,-40,3,-1,3,1,0.125f,0f,100,0.3f);
-
+			Model m = OBJLoader.loadOBJ("res/models/affe.obj");
 			ambientLight.setLightInt(new Color(0.1f,0.1f,0.1f));
 			Quader q = new Quader(1, 1, 1);
-			quader = new Entity(new Transformation(-0, 0.5f, -20), q.getModelID());
+			quader = new Entity(new Transformation(-0, 0.5f, -20), m.getModelID());
 			quader.setColor(0.5f, 1, 0.25f);
 			quader.getMat().setSpecularExponent(128);
 			quader.getMat().setSpecularIntensity(10);
+			
 			player = new Entity(new Transformation(0, 0, 0), new Quader(0.5f, 2, 0.5f).getModelID());
-			new Entity(new Transformation(-20, 0.5f, -10), q.getModelID()).setTexture(new Texture("res/textures/dragon.png"));;
-			cam = new FlyCamera(1024, 1024);
+//			new Entity(new Transformation(-20, 0.5f, -10), m.getModelID()).setTexture(new Texture("res/textures/dragon.png"));;
+			cam = new FlyCamera(getW(), getH());
 			cam.setY(2.f);
 			c = (FlyCamera) cam;
 			c.setSpeed(3);
 			cam.setX(0);
 			cam.setY(2);
 			cam.setZ(0);
+			
 			Entity plane = new Entity(new Transformation(0, 0, -20, 90, 0, 0), new Plane(100, 100).getModelID());
+			
 			plane.getMat().setSpecularIntensity(0.0f);
 			PointLight p = new PointLight(new Color(1.5f, 0.5f, 0.5f), -5, 4, -5, 1, 1, 0, 100);
 			
@@ -82,11 +94,7 @@ public class TestShadowMap extends MainApplication{
 			msg.setY(0.85f);
 			msg.setScaleX(0.5f);
 			msg.setScaleY(0.125f);
-			new GrayScaleEfect(true);
 //			new BloomEfect(true);
-//			new BloomPassOneEffect();
-//			new BlurEfect(true, 2, 0, 1);
-//			new BlurEfect(true, 2, 1, 0);
 		}
 		
 		@Override
