@@ -2,18 +2,20 @@ package renderengine.light;
 
 import java.util.List;
 
+import org.lwjgl.util.vector.Vector3f;
+
 import renderengine.core.AppHandler;
 import renderengine.core.Camera;
 import renderengine.core.Color;
 import renderengine.core.Entity;
 import renderengine.model.Model;
-import renderengine.shader.ForDiractionalShader;
-import renderengine.shader.ForPointShader;
+import renderengine.shader.Shader;
 
 public class PointLight extends Light{
 	
 	private float attenuationConst ,attenuationLinear,attenuationExp;
 	private float range;
+	private Shader shader;
 	public PointLight(Color color, float x, float y, float z,float attenuationConst,float attenuationLinear,float attenuationExp,float range) {
 		super(color, x, y, z);
 
@@ -21,6 +23,11 @@ public class PointLight extends Light{
 		this.attenuationLinear = attenuationLinear;
 		this.attenuationExp = attenuationExp;
 		this.range = range;
+		if(AppHandler.mainApp.renderEngine.getShader("pointShader")==null){
+			
+			AppHandler.mainApp.renderEngine.addShader("pointShader", new Shader("res/shaders/forPoint.vert", "res/shaders/forPoint.frag"));
+		}
+		shader = AppHandler.mainApp.renderEngine.getShader("pointShader");
 	}
 	
 	public PointLight(Color color, float x, float y, float z,float attenuationConst,float attenuationLinear,float attenuationExp) {
@@ -30,34 +37,46 @@ public class PointLight extends Light{
 		this.attenuationLinear = attenuationLinear;
 		this.attenuationExp = attenuationExp;
 		this.range = 100;
+		if(AppHandler.mainApp.renderEngine.getShader("pointShader")==null){
+			AppHandler.mainApp.renderEngine.addShader("pointShader", new Shader("res/shaders/forPoint.vert", "res/shaders/forPoint.frag"));
+		}
+		shader = AppHandler.mainApp.renderEngine.getShader("pointShader");
 	}
-
+	private Vector3f buffer;
+	
 	@Override
 	public void updateLight(Camera cam) {
-		AppHandler.pointShader.useShader();
-		AppHandler.pointShader.loadProjectionMatrix(cam.getProjectionMatrix());
-		AppHandler.pointShader.loadViewMat(cam.getViewMatrix());
-		AppHandler.pointShader.loadLightInt(color);
-		AppHandler.pointShader.loadLightPos(x, y, z);
-		AppHandler.pointShader.loadAttenuation(attenuationConst,attenuationLinear,attenuationExp);
-		AppHandler.pointShader.loadRange(range);
-		AppHandler.pointShader.loadCamPos(cam.getX(), cam.getY(), cam.getZ());
-		AppHandler.pointShader.unbindShader();
+		shader = AppHandler.mainApp.renderEngine.getShader("pointShader");
+		shader.bind();
+		shader.loadUpMat4("projMat", cam.getProjectionMatrix());
+		shader.loadUpMat4("viewMat", cam.getViewMatrix());
+		buffer = new Vector3f(color.getR(), color.getG(), color.getB());
+		shader.loadUpVec3("lightInt", buffer);
+		buffer = new Vector3f(x, y, z);
+		shader.loadUpVec3("lightPos", buffer);
+		buffer = new Vector3f(attenuationConst, attenuationLinear, attenuationExp);
+		shader.loadUpVec3("attenuation", buffer);
+		shader.loadUpFloat("range", range);
+		buffer = new Vector3f(cam.getX(), cam.getY(), cam.getZ());
+		shader.loadUpVec3("camPos", buffer);
+		
 	}
 
 	@Override
 	public void renderModel(Model model, List<Entity> e) {
-		AppHandler.pointShader.useShader();
+		shader.bind();
 		model.bindModel();
 		for (Entity entity : e) {
 			entity.getTexture().bind(0);
-			AppHandler.pointShader.loadColor(entity.getColor());
-			AppHandler.pointShader.loadSpecularData(entity.getMat().getSpecularIntensity(), entity.getMat().getSpecularExponent());
-			AppHandler.pointShader.loadModelMat(entity.getTransFormationMatrix());
+			buffer = new Vector3f(entity.getColor().getR(), entity.getColor().getG(), entity.getColor().getB());
+			shader.loadUpVec3("color", buffer);
+			shader.loadUpFloat("specularInt", entity.getMat().getSpecularIntensity());
+			shader.loadUpFloat("specularExp", entity.getMat().getSpecularExponent());
+			shader.loadUpMat4("modelMat", entity.getTransFormationMatrix());
 			model.renderEntities();
 			entity.getTexture().unbind();
 		}
-		AppHandler.pointShader.unbindShader();
+		shader.unbind();
 	}
 
 	@Override

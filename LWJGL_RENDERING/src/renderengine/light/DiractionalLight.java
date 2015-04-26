@@ -12,9 +12,10 @@ import renderengine.core.Entity;
 import renderengine.core.Window;
 import renderengine.model.Model;
 import renderengine.shader.ForDiractionalShader;
+import renderengine.shader.Shader;
 
 public class DiractionalLight extends Light{
-	
+	private Shader shader,shadow;
 	private float xDir,yDir,zDir;
 	public DiractionalLight(Color color, float xDir, float yDir, float zDir) {
 		super(color, 0, 100, -100);
@@ -22,10 +23,22 @@ public class DiractionalLight extends Light{
 		this.yDir = yDir;
 		this.zDir = zDir;
 		shadowInfo = new ShadowInfo(Window.getW(),Window.getH());
+		System.out.println("Light");
+		if(AppHandler.mainApp.renderEngine.getShader("diractionalShader")==null){
+			AppHandler.mainApp.renderEngine.addShader("diractionalShader", new Shader("res/shaders/forDiractional.vert", "res/shaders/forDiractional.frag"));
+		}
+		if(AppHandler.mainApp.renderEngine.getShader("shadowShader")==null){
+			AppHandler.mainApp.renderEngine.addShader("shadowShader", new Shader("res/shaders/shadowMap.vert", "res/shaders/shadowMap.frag"));
+		}
+		shader = AppHandler.mainApp.renderEngine.getShader("diractionalShader");
+		shadow = AppHandler.mainApp.renderEngine.getShader("shadowShader");
 	}
 
 	@Override
 	public void updateLight(Camera cam) {
+		shader = AppHandler.mainApp.renderEngine.getShader("diractionalShader");
+		shader.bind();
+		shader.loadUpMat4("projMat", cam.getProjectionMatrix());
 		AppHandler.diractionalShader.useShader();
 		AppHandler.diractionalShader.loadProjectionMatrix(cam.getProjectionMatrix());
 		AppHandler.diractionalShader.loadViewMat(cam.getViewMatrix());
@@ -81,28 +94,28 @@ public class DiractionalLight extends Light{
 		this.zDir = zDir;
 	}
 
+	
 	@Override
 	public void updateShadowInfo() {
 		shadowInfo.updateCamera(x, y, z, xDir, yDir, zDir);
-		AppHandler.shadowShader.useShader();
-		AppHandler.shadowShader.loadProjectionMatrix(shadowInfo.getCam().getProjectionMatrix());
-		AppHandler.shadowShader.loadViewMat(shadowInfo.getCam().getViewMatrix());
-		AppHandler.shadowShader.unbindShader();
+		shadow.bind();
+		shadow.loadUpMat4("projMat", shadowInfo.getCam().getProjectionMatrix());
+		shadow.loadUpMat4("viewMat", shadowInfo.getCam().getViewMatrix());
 	}
 
 
 	@Override
 	public void renderShadowMap(Model m, List<Entity> e) {
-		AppHandler.shadowShader.useShader();
+		shadow.bind();
 		GL11.glCullFace(GL11.GL_FRONT);
 		m.bindModel();
 		for (Entity entity : e) {
-			AppHandler.shadowShader.loadModelMat(entity.getTransFormationMatrix());
+			shadow.loadUpMat4("modelMat", entity.getTransFormationMatrix());
 			m.renderEntities();
 		}
 		m.unbindModel();
-		GL11.glCullFace(GL11.GL_BACK);
-		AppHandler.shadowShader.unbindShader();
+		
+		shadow.unbind();
 	}
 	
 

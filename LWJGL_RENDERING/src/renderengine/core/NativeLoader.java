@@ -4,8 +4,6 @@ import java.io.File;
 
 import javax.swing.filechooser.FileFilter;
 
-import org.lwjgl.opengl.GLContext;
-
 public class NativeLoader {
 	public static void loadNatives(){
 		String os = System.getProperty("os.name");

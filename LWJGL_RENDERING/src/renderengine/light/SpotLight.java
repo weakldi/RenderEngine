@@ -3,6 +3,7 @@ package renderengine.light;
 import java.util.List;
 
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.util.vector.Vector3f;
 
 import renderengine.core.AppHandler;
 import renderengine.core.Camera;
@@ -11,6 +12,7 @@ import renderengine.core.Entity;
 import renderengine.core.Material;
 import renderengine.core.Window;
 import renderengine.model.Model;
+import renderengine.shader.Shader;
 
 public class SpotLight extends Light{
 	
@@ -18,6 +20,8 @@ public class SpotLight extends Light{
 	private float range;
 	private float cutoff;
 	private float dirX,dirY,dirZ;
+	private Shader shader;
+	private Shader shadow;
 	public SpotLight(Color color, float x, float y, float z,float dirX,float dirY,float dirZ,float attenuationConst,float attenuationLinear,float attenuationExp,float range,float cutoff) {
 		super(color, x, y, z);
 
@@ -30,6 +34,22 @@ public class SpotLight extends Light{
 		this.dirY = dirY;
 		this.dirZ = dirZ;
 		shadowInfo = new ShadowInfo(Window.getW(),Window.getH());
+		if(AppHandler.mainApp.renderEngine.getShader("spotShader")==null){
+			
+			AppHandler.mainApp.renderEngine.addShader("spotShader", new Shader("res/shaders/forSpot.vert", "res/shaders/forSpot.frag"));
+		}
+		if(AppHandler.mainApp.renderEngine.getShader("shadowShader")==null){
+			AppHandler.mainApp.renderEngine.addShader("shadowShader", new Shader("res/shaders/shadowMap.vert", "res/shaders/shadowMap.frag"));
+		}
+		
+		shader = AppHandler.mainApp.renderEngine.getShader("spotShader");
+		
+		shader.bind();
+		shader.loadUpInt("textureSampler", 0);
+		shader.loadUpInt("shadowMap", 1);
+		shader.unbind();
+	
+		shadow = AppHandler.mainApp.renderEngine.getShader("shadowShader");
 	}
 	
 	public SpotLight(Color color, float x, float y, float z,float dirX,float dirY,float dirZ,float attenuationConst,float attenuationLinear,float attenuationExp,float cutoff) {
@@ -44,46 +64,73 @@ public class SpotLight extends Light{
 		this.dirY = dirY;
 		this.dirZ = dirZ;
 		shadowInfo = new ShadowInfo(Window.getW(),Window.getH());
-	}
-
-	@Override
-	public void updateLight(Camera cam) {
-		AppHandler.spotShader.useShader();
-		AppHandler.spotShader.loadProjectionMatrix(cam.getProjectionMatrix());
-		AppHandler.spotShader.loadViewMat(cam.getViewMatrix());
-		AppHandler.spotShader.loadLightInt(color);
-		AppHandler.spotShader.loadLightPos(x, y, z);
-		AppHandler.spotShader.loadAttenuation(attenuationConst,attenuationLinear,attenuationExp);
-		AppHandler.spotShader.loadRange(range);
-		AppHandler.spotShader.loadCutoff(cutoff);
-		AppHandler.spotShader.loadSpotDir(dirX, dirY, dirZ);
-		AppHandler.spotShader.loadCamPos(cam.getX(), cam.getY(), cam.getZ());
-		if(shadowInfo!=null){
-			AppHandler.spotShader.loadDepthViewMat(shadowInfo.getCam().getViewMatrix());
-			AppHandler.spotShader.loadDepthProjectionMatrix(shadowInfo.getCam().getProjectionMatrix());
-		}else{
-			AppHandler.spotShader.loadDepthViewMat(cam.getViewMatrix());
-			AppHandler.spotShader.loadDepthProjectionMatrix(cam.getProjectionMatrix());
+		if(AppHandler.mainApp.renderEngine.getShader("spotShader")==null){
+			
+			AppHandler.mainApp.renderEngine.addShader("spotShader", new Shader("res/shaders/forSpot.vert", "res/shaders/forSpot.frag"));
+		}
+		if(AppHandler.mainApp.renderEngine.getShader("shadowShader")==null){
+			AppHandler.mainApp.renderEngine.addShader("shadowShader", new Shader("res/shaders/shadowMap.vert", "res/shaders/shadowMap.frag"));
 		}
 		
-		AppHandler.spotShader.unbindShader();
+		shader = AppHandler.mainApp.renderEngine.getShader("spotShader");
+		
+		shader.bind();
+		shader.loadUpInt("textureSampler", 0);
+		shader.loadUpInt("shadowMap", 1);
+		shader.unbind();
+	
+		shadow = AppHandler.mainApp.renderEngine.getShader("shadowShader");
+	}
+	private Vector3f buffer;
+	@Override
+	public void updateLight(Camera cam) {
+		shader = AppHandler.mainApp.renderEngine.getShader("spotShader");
+		shader.bind();
+		shader.loadUpMat4("projMat", cam.getProjectionMatrix());
+		shader.loadUpMat4("viewMat", cam.getViewMatrix());
+		buffer = new Vector3f(color.getR(), color.getG(), color.getB());
+		shader.loadUpVec3("lightInt", buffer);
+		buffer = new Vector3f(x, y, z);
+		shader.loadUpVec3("lightPos", buffer);
+		buffer = new Vector3f(attenuationConst, attenuationLinear, attenuationExp);
+		shader.loadUpVec3("attenuation", buffer);
+		shader.loadUpFloat("range", range);
+		buffer = new Vector3f(cam.getX(), cam.getY(), cam.getZ());
+		shader.loadUpVec3("camPos", buffer);
+		shader.loadUpFloat("cutoff", cutoff);
+		buffer = new Vector3f(dirX, dirY, dirZ);
+		shader.loadUpVec3("spotDir", buffer);
+
+		if(shadowInfo!=null){
+			shader.loadUpMat4("depthProjMat", shadowInfo.getCam().getProjectionMatrix());
+			shader.loadUpMat4("depthViewMat", shadowInfo.getCam().getViewMatrix());
+		}else{
+			shader.loadUpMat4("depthProjMat", cam.getProjectionMatrix());
+			shader.loadUpMat4("depthViewMat", cam.getViewMatrix());
+		}
+		
+		
 	}
 
 	@Override
 	public void renderModel(Model model, List<Entity> e) {
-		AppHandler.spotShader.useShader();
 		
+		shader.bind();
 		if(shadowInfo!=null)
 			shadowInfo.getFinalShadowmap().bind(1);
 		else
 			Material.getBaseTexture().bind(1);
-//		shadowInfo.getShadowMap().bind(1);
+
 		model.bindModel();
 		for (Entity entity : e) {
 			entity.getTexture().bind(0);
-			AppHandler.spotShader.loadColor(entity.getColor());
-			AppHandler.spotShader.loadSpecularData(entity.getMat().getSpecularIntensity(), entity.getMat().getSpecularExponent());
-			AppHandler.spotShader.loadModelMat(entity.getTransFormationMatrix());
+			
+			buffer = new Vector3f(entity.getColor().getR(), entity.getColor().getG(), entity.getColor().getB());
+			shader.loadUpVec3("color", buffer);
+			shader.loadUpFloat("specularInt", entity.getMat().getSpecularIntensity());
+			shader.loadUpFloat("specularExp", entity.getMat().getSpecularExponent());
+			shader.loadUpMat4("modelMat", entity.getTransFormationMatrix());
+			
 			model.renderEntities();
 			entity.getTexture().unbind();
 		}
@@ -92,31 +139,30 @@ public class SpotLight extends Light{
 			shadowInfo.getShadowMap().unbind();
 		else
 			Material.getBaseTexture().unbind();
-		AppHandler.spotShader.unbindShader();
+		shader.unbind();
 	}
 
 	@Override
 	public void updateShadowInfo() {
 		shadowInfo.updateCamera(x, y, z, dirX, dirY, dirZ);
-		AppHandler.shadowShader.useShader();
-		AppHandler.shadowShader.loadProjectionMatrix(shadowInfo.getCam().getProjectionMatrix());
-		AppHandler.shadowShader.loadViewMat(shadowInfo.getCam().getViewMatrix());
-		AppHandler.shadowShader.unbindShader();
+		shadow.bind();
+		shadow.loadUpMat4("projMat", shadowInfo.getCam().getProjectionMatrix());
+		shadow.loadUpMat4("viewMat", shadowInfo.getCam().getViewMatrix());
 	}
 
 
 	@Override
 	public void renderShadowMap(Model m, List<Entity> e) {
-		AppHandler.shadowShader.useShader();
+		shadow.bind();
 		GL11.glCullFace(GL11.GL_FRONT);
 		m.bindModel();
 		for (Entity entity : e) {
-			AppHandler.shadowShader.loadModelMat(entity.getTransFormationMatrix());
+			shadow.loadUpMat4("modelMat", entity.getTransFormationMatrix());
 			m.renderEntities();
 		}
 		m.unbindModel();
 		
-		AppHandler.shadowShader.unbindShader();
+		shadow.unbind();
 	}
 	public float getAttenuationConst() {
 		return attenuationConst;

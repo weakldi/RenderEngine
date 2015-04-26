@@ -31,6 +31,7 @@ public class Tester extends javax.swing.JFrame {
     	apps.put("Shadowmap",new TestShadowMap(800, 600));
     	apps.put("OBJLoader",new TestOBJLoader(800, 600));
     	apps.put("Bloom", new TestBloom());
+    	apps.put("Terrain", new TestTerrain());
         initComponents();
        
     }

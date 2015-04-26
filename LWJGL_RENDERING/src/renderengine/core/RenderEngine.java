@@ -1,31 +1,32 @@
 package renderengine.core;
 
+import static org.lwjgl.opengl.GL11.GL_BACK;
 import static org.lwjgl.opengl.GL11.GL_BLEND;
+import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
+import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
+import static org.lwjgl.opengl.GL11.GL_EQUAL;
+import static org.lwjgl.opengl.GL11.GL_FILL;
 import static org.lwjgl.opengl.GL11.GL_FRONT;
-import static org.lwjgl.opengl.GL11.GL_LINE;
-import static org.lwjgl.opengl.GL30.*;
-import static org.lwjgl.opengl.GL20.*;
-import static org.lwjgl.opengl.GL15.*;
-import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL11.GL_LESS;
+import static org.lwjgl.opengl.GL11.GL_LINEAR;
+import static org.lwjgl.opengl.GL11.GL_ONE;
+import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
+import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
+import static org.lwjgl.opengl.GL11.glBlendFunc;
+import static org.lwjgl.opengl.GL11.glCullFace;
+import static org.lwjgl.opengl.GL11.glDepthFunc;
+import static org.lwjgl.opengl.GL11.glDepthMask;
+import static org.lwjgl.opengl.GL11.glDisable;
+import static org.lwjgl.opengl.GL11.glEnable;
+import static org.lwjgl.opengl.GL30.GL_COLOR_ATTACHMENT0;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-
-
-
-
-
-
-
-
-
 
 import org.lwjgl.opengl.GL11;
 
-import renderengine.efects.BlurEfect;
 import renderengine.efects.Efect;
-import renderengine.efects.FXAAEfect;
-import renderengine.gui.Font;
 import renderengine.gui.GUIComponent;
 import renderengine.light.AmbientLight;
 import renderengine.light.Light;
@@ -38,9 +39,12 @@ public class RenderEngine {
 	private Texture buffer1;
 	private Texture buffer2;
 	private List<Efect> efects;
+	private HashMap<String, renderengine.shader.Shader> shaders;
 	public RenderEngine() {
 		root = new GUIComponent(true);
 		efects = new ArrayList<Efect>();
+		shaders = new HashMap<>();
+		
 		//Die zwei Framebuffer erstellen, die für das postprocessing genutzt werden.
 		buffer1 = new Texture(Window.getW(),Window.getH(),GL_COLOR_ATTACHMENT0,GL_LINEAR,false);
 		buffer2 = new Texture(Window.getW(),Window.getH(),GL_COLOR_ATTACHMENT0,GL_LINEAR,false);
@@ -63,56 +67,17 @@ public class RenderEngine {
 		renderScene(cam, models, ambientLight, lights);
 		finalRender();
 	}
-	/**
-	 * Rendert die Szene mit Forwardrendering
-	 * @param cam Die Kamera die für das rendern benutzt werden soll.
-	 * @param models Alle models die gerendert werden sollen
-	 * @param ambientLight das Ambielte licht
-	 * @param lights Alle anderen Lichter der Szene
-	 */
-	 
-	 
-	private void renderScene(Camera cam,List<Model> models,AmbientLight ambientLight,List<Light> lights){
-		//Framebuffer binden.
-		buffer1.bindAsRenderTarget();
-		
-		//Den Framebuffer lehren und das Rendern Forbereiten
-		GLUtil.setClearColor(0, 0, 0);
-		GLUtil.clearScreen();
-		GL11.glPolygonMode(GL_FRONT, GL_FILL);
-		glEnable(GL_CULL_FACE);
-		glCullFace(GL_BACK);
-		//Szene mit ambienten Licht rendern darbei wird der Depthtest durchgeführt.
-		ambientLight.updateLight(cam);
-		for (Model model : models) {
-			ambientLight.renderModel(model,Models.getEntitys(model.getModelID()));
-		}
-		//Rendereinstellungen für die Lichter vorbereiten und nur Fragments mit gleichem Z-Wert wie im Depthbuffer rendern.
-		//Dies sorgt dafür, dass nur sichtbare flächen gerendert werden und somit viel zeit für die Lichtberechnung eingespart wird.
-		//Durch das addieren der neuen farbe auf den Ausgenswert wird das endgültige Bild erzeugt.
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_ONE, GL_ONE);
-		glDepthMask(false);
-		glDepthFunc(GL_EQUAL);
-		for (Light light : lights) {
-			
-			if(light.isEnabeld()){
-				
-				for (Model model : models) {
-					light.updateLight(cam);
-					light.renderModel(model,Models.getEntitys(model.getModelID()));
-				}
-			}
-		}
-		glDepthFunc(GL_LESS);
-		glDepthMask(true);
-		glDisable(GL_DEPTH_TEST);
-		glDisable(GL_BLEND);
-		buffer1.unbindFrambuffer();
-		
+	
+	public void addShader(String name,renderengine.shader.Shader shader){
+		shaders.put(name, shader);
 	}
 	
-	
+	public void replaceShader(String name,renderengine.shader.Shader shader){
+		shaders.replace(name, shader);
+	}
+	public renderengine.shader.Shader getShader(String name){
+		return shaders.get(name);
+	}
 	public void render(Camera cam,List<Model> models,AmbientLight ambientLight,List<Light> lights,SkyBox sky){
 		
 		
@@ -131,9 +96,9 @@ public class RenderEngine {
 			
 			if(light.isEnabeld()){
 				light.updateLight(cam);
-					for (Model model : models) {
-//						light.renderModel(model);
-				}
+//					for (Model model : models) {
+////						light.renderModel(model);
+//				}
 			}
 		}
 		sky.render(cam);
@@ -147,6 +112,11 @@ public class RenderEngine {
 	}
 	public void addEffect(Efect efect) {
 		efects.add(efect);
+	}
+	
+	public void cleanUp(){
+		for(String name : shaders.keySet())
+			getShader(name).deleteShader();;
 	}
 	/**
 	 * 
@@ -201,6 +171,55 @@ public class RenderEngine {
 		
 		
 		glDisable(GL_BLEND);
+	}
+	
+	/**
+	 * Rendert die Szene mit Forwardrendering
+	 * @param cam Die Kamera die für das rendern benutzt werden soll.
+	 * @param models Alle models die gerendert werden sollen
+	 * @param ambientLight das Ambielte licht
+	 * @param lights Alle anderen Lichter der Szene
+	 */
+	 
+	 
+	private void renderScene(Camera cam,List<Model> models,AmbientLight ambientLight,List<Light> lights){
+		//Framebuffer binden.
+		buffer1.bindAsRenderTarget();
+		
+		//Den Framebuffer lehren und das Rendern Forbereiten
+		GLUtil.setClearColor(0, 0, 0);
+		GLUtil.clearScreen();
+		GL11.glPolygonMode(GL_FRONT, GL_FILL);
+		glEnable(GL_CULL_FACE);
+		glCullFace(GL_BACK);
+		//Szene mit ambienten Licht rendern darbei wird der Depthtest durchgeführt.
+		ambientLight.updateLight(cam);
+		for (Model model : models) {
+			ambientLight.renderModel(model,Models.getEntitys(model.getModelID()));
+		}
+		//Rendereinstellungen für die Lichter vorbereiten und nur Fragments mit gleichem Z-Wert wie im Depthbuffer rendern.
+		//Dies sorgt dafür, dass nur sichtbare flächen gerendert werden und somit viel zeit für die Lichtberechnung eingespart wird.
+		//Durch das addieren der neuen farbe auf den Ausgenswert wird das endgültige Bild erzeugt.
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_ONE, GL_ONE);
+		glDepthMask(false);
+		glDepthFunc(GL_EQUAL);
+		for (Light light : lights) {
+			
+			if(light.isEnabeld()){
+				
+				for (Model model : models) {
+					light.updateLight(cam);
+					light.renderModel(model,Models.getEntitys(model.getModelID()));
+				}
+			}
+		}
+		glDepthFunc(GL_LESS);
+		glDepthMask(true);
+		glDisable(GL_DEPTH_TEST);
+		glDisable(GL_BLEND);
+		buffer1.unbindFrambuffer();
+		
 	}
 	
 	

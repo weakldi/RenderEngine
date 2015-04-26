@@ -11,7 +11,7 @@ uniform vec3 lightInt;
 uniform vec3 lightPos;
 uniform vec3 attenuation;
 uniform float specularInt;
-uniform float speculaExp;
+uniform float specularExp;
 uniform vec3 camPos;
 uniform sampler2D textureSampler;
 uniform float range;
@@ -62,7 +62,7 @@ void main(void){
 			vec3 reflectDir = normalize(reflect(toLightDir, normalize( pass_normal)));
 		
 			float specFactor = dot(eyeDir,reflectDir);
-			specFactor = pow(specFactor,speculaExp);
+			specFactor = pow(specFactor,specularExp);
 			if(specFactor>0){
 				specColor = lightInt*specularInt*specFactor;
 			}

@@ -1,7 +1,5 @@
 package renderengine.core;
 
-import org.lwjgl.opengl.Display;
-
 import renderengine.input.Keyboard;
 import renderengine.input.Mouse;
 

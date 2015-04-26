@@ -8,7 +8,7 @@ import renderengine.core.Material;
 
 public class Terrain extends Model{
 	private final int MAX_PIXEL_COLOR = 256*256*256;
-	private static final int VERTEX_COUNT = 200;
+	private static final int VERTEX_COUNT = 64;
 	private static final float SIZE = 300;
 	public Terrain(BufferedImage heightMap) {
 		super();

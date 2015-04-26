@@ -13,23 +13,19 @@ import renderengine.model.Model;
 import renderengine.model.SkyBox;
 import renderengine.shader.BloomPassOneShader;
 import renderengine.shader.FXAAShader;
-import renderengine.shader.ForAmbientShader;
 import renderengine.shader.ForDiractionalShader;
-import renderengine.shader.ForPointShader;
-import renderengine.shader.ForSpotShader;
 import renderengine.shader.GUIShader;
 import renderengine.shader.GUITextureAtlasShader;
 import renderengine.shader.GaussBlurShader;
 import renderengine.shader.GrayScaleShader;
 import renderengine.shader.MixShader;
-import renderengine.shader.ShadowMapShader;
 import renderengine.shader.SkyBoxShader;
 
 
 public abstract class MainApplication {
 
 	protected boolean run;
-	protected RenderEngine renderEngine;
+	public RenderEngine renderEngine;
 	protected List<Model> models;
 	protected List<Light> lights;
 	protected Camera cam;
@@ -46,7 +42,7 @@ public abstract class MainApplication {
 		this.w = w;
 		this.h = h;
 		models = new ArrayList<Model>();
-		ambientLight = new AmbientLight();
+		
 		lights = new ArrayList<>();
 		cams = new ArrayList<>();
 		run = false;
@@ -57,17 +53,15 @@ public abstract class MainApplication {
 		
 		NativeLoader.loadNatives();
 		Window.createWindow(w, h);
-		renderEngine = new RenderEngine();
 		
 		GLUtil.initGL();
 		AppHandler.mainApp = this;
+		renderEngine = new RenderEngine();
+		ambientLight = new AmbientLight();
 		cam = new Camera(Window.getW(),Window.getH());
-		AppHandler.ambientShader = new ForAmbientShader();
+		
 		AppHandler.diractionalShader = new ForDiractionalShader();
-		AppHandler.pointShader = new ForPointShader();
 		AppHandler.skyShader = new SkyBoxShader();
-		AppHandler.shadowShader = new ShadowMapShader();
-		AppHandler.spotShader = new ForSpotShader();
 		AppHandler.guiShader = new GUIShader();
 		AppHandler.fxaaShader = new FXAAShader();
 		AppHandler.blurShader = new GaussBlurShader();
@@ -149,12 +143,12 @@ public abstract class MainApplication {
 	}
 
 	private void cleanUP(){
-		AppHandler.ambientShader.deleteShader();
+		
 		AppHandler.diractionalShader.deleteShader();
-		AppHandler.pointShader.deleteShader();
+		
 		AppHandler.skyShader.deleteShader();
-		AppHandler.shadowShader.deleteShader();
-		AppHandler.spotShader.deleteShader();
+		
+
 		AppHandler.guiShader.deleteShader();
 		AppHandler.fxaaShader.deleteShader();
 		AppHandler.blurShader.deleteShader();
@@ -162,6 +156,7 @@ public abstract class MainApplication {
 		AppHandler.grayScale.deleteShader();
 		AppHandler.bloomeOne.deleteShader();
 		AppHandler.mixShader.deleteShader();
+		renderEngine.cleanUp();
 		for (int i = 0; i < models.size(); i++) {
 			models.get(i).delete();
 		}

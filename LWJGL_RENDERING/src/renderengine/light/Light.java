@@ -7,6 +7,7 @@ import renderengine.core.Camera;
 import renderengine.core.Color;
 import renderengine.core.Entity;
 import renderengine.model.Model;
+import renderengine.shader.Shader;
 
 
 public abstract class Light {
@@ -31,6 +32,8 @@ public abstract class Light {
 	public void deleteLight(){
 		AppHandler.mainApp.removeLight(this);
 	}
+	
+	
 	
 	public float getX() {
 		return x;

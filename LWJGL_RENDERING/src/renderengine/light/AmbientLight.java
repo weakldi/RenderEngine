@@ -2,43 +2,53 @@ package renderengine.light;
 
 import java.util.List;
 
+import org.lwjgl.util.vector.Vector3f;
+
 import renderengine.core.AppHandler;
 import renderengine.core.Camera;
 import renderengine.core.Color;
 import renderengine.core.Entity;
 import renderengine.model.Model;
-import renderengine.shader.ForAmbientShader;
+import renderengine.shader.Shader;
 
 public class AmbientLight {
 	private Color lightInt;
-	private ForAmbientShader shader;
+	private Shader ambientShader;
 	public AmbientLight(){
 		lightInt = new Color(0,0,0);
-		shader = AppHandler.ambientShader;
+		if(AppHandler.mainApp.renderEngine.getShader("ambientShader")==null){
+			AppHandler.mainApp.renderEngine.addShader("ambientShader", new Shader("res/shaders/forAmbient.vert", "res/shaders/forAmbient.frag"));
+		}
+		ambientShader = AppHandler.mainApp.renderEngine.getShader("ambientShader");
 	}
 	
 	public void updateLight(Camera cam){
-		AppHandler.ambientShader.useShader();
-		AppHandler.ambientShader.loadProjectionMatrix(cam.getProjectionMatrix());
-		AppHandler.ambientShader.loadViewMat(cam.getViewMatrix());
-		AppHandler.ambientShader.loadAmbientInt(lightInt);
-		AppHandler.ambientShader.unbindShader();
+		ambientShader = AppHandler.mainApp.renderEngine.getShader("ambientShader");
+		ambientShader.bind();
+		ambientShader.loadUpMat4("projMat", cam.getProjectionMatrix());
+		ambientShader.loadUpMat4("viewMat", cam.getViewMatrix());
+		Vector3f c = new Vector3f(lightInt.getR(),lightInt.getG(), lightInt.getB());
+		ambientShader.loadUpVec3("ambientLightIntensity",c);
+		ambientShader.unbind();
 	}
 	
 	public void renderModel(Model m,List<Entity> e){
-		AppHandler.ambientShader.useShader();
+		ambientShader.bind();
 		
 		
 		m.bindModel();
 		for (Entity entity : e) {
 			entity.getTexture().bind();
-			AppHandler.ambientShader.loadColor(entity.getColor());
-			AppHandler.ambientShader.loadModelMat(entity.getTransFormationMatrix());
+			Color color = entity.getColor();
+			Vector3f c = new Vector3f(color.getR(),color.getG(), color.getB());
+			ambientShader.loadUpVec3("color",c);
+			
+			ambientShader.loadUpMat4("modelMat", entity.getTransFormationMatrix());
 			m.renderEntities();
 		}
 		m.unbindModel();
 		
-		AppHandler.ambientShader.unbindShader();
+		ambientShader.unbind();
 	}
 	
 	public Color getLightInt() {
