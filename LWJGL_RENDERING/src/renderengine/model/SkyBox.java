@@ -1,15 +1,7 @@
 package renderengine.model;
 
-import org.lwjgl.opengl.GL11;
-
-import renderengine.core.AppHandler;
 import renderengine.core.Camera;
 import renderengine.core.VAO;
-import renderengine.core.Vertex;
-import static org.lwjgl.opengl.GL30.*;
-import static org.lwjgl.opengl.GL20.*;
-import static org.lwjgl.opengl.GL13.*;
-import static org.lwjgl.opengl.GL11.*;
 public class SkyBox {
 	private VAO cube;
 
@@ -77,16 +69,16 @@ public class SkyBox {
 	}
 	
 	public void render(Camera cam){
-		AppHandler.skyShader.useShader();
-		AppHandler.skyShader.loadProjectionMat(cam.getProjectionMatrix());
-		AppHandler.skyShader.loadViewMat(cam.getViewMatrix());
-		GL11.glDisable(GL11.GL_CULL_FACE);
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_CUBE_MAP, TextureID);
-		cube.bind();
-		glDrawArrays(GL_TRIANGLES, 0, VERTICES.length);
-		cube.unBind();
-		AppHandler.skyShader.unbindShader();
+//		AppHandler.skyShader.useShader();
+//		AppHandler.skyShader.loadProjectionMat(cam.getProjectionMatrix());
+//		AppHandler.skyShader.loadViewMat(cam.getViewMatrix());
+//		GL11.glDisable(GL11.GL_CULL_FACE);
+//		glActiveTexture(GL_TEXTURE0);
+//		glBindTexture(GL_TEXTURE_CUBE_MAP, TextureID);
+//		cube.bind();
+//		glDrawArrays(GL_TRIANGLES, 0, VERTICES.length);
+//		cube.unBind();
+//		AppHandler.skyShader.unbindShader();
 	}
 	
 	

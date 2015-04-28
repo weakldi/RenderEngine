@@ -23,11 +23,9 @@ public class PointLight extends Light{
 		this.attenuationLinear = attenuationLinear;
 		this.attenuationExp = attenuationExp;
 		this.range = range;
-		if(AppHandler.mainApp.renderEngine.getShader("pointShader")==null){
-			
-			AppHandler.mainApp.renderEngine.addShader("pointShader", new Shader("res/shaders/forPoint.vert", "res/shaders/forPoint.frag"));
-		}
-		shader = AppHandler.mainApp.renderEngine.getShader("pointShader");
+		
+		shader = AppHandler.mainApp.renderEngine.loadShader("pointShader", "res/shaders/forPoint.vert", "res/shaders/forPoint.frag");
+		
 	}
 	
 	public PointLight(Color color, float x, float y, float z,float attenuationConst,float attenuationLinear,float attenuationExp) {
@@ -37,10 +35,7 @@ public class PointLight extends Light{
 		this.attenuationLinear = attenuationLinear;
 		this.attenuationExp = attenuationExp;
 		this.range = 100;
-		if(AppHandler.mainApp.renderEngine.getShader("pointShader")==null){
-			AppHandler.mainApp.renderEngine.addShader("pointShader", new Shader("res/shaders/forPoint.vert", "res/shaders/forPoint.frag"));
-		}
-		shader = AppHandler.mainApp.renderEngine.getShader("pointShader");
+		shader = AppHandler.mainApp.renderEngine.loadShader("pointShader", "res/shaders/forPoint.vert", "res/shaders/forPoint.frag");
 	}
 	private Vector3f buffer;
 	

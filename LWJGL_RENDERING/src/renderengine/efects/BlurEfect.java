@@ -1,34 +1,37 @@
 package renderengine.efects;
 
+import org.lwjgl.util.vector.Vector2f;
+
 import renderengine.core.AppHandler;
-import renderengine.core.Window;
+import renderengine.shader.Shader;
 import renderengine.texture.Texture;
 
 public class BlurEfect extends Efect{
 	private float radius;
 	private float dirX;
 	private float dirY;
-	
+	private Shader shader;
 	public BlurEfect(boolean finalRender,float radius,float dirX,float dirY) {
 		super(finalRender);
 		this.radius = radius;
 		this.dirX = dirX;
 		this.dirY = dirY;
+		shader = AppHandler.mainApp.renderEngine.loadShader("blurShader", "res/shaders/blur.vert", "res/shaders/blur.frag");
 	}
 
 	@Override
 	protected void afterReder() {
-		AppHandler.blurShader.unbindShader();
-		
+		shader.unbind();
 	}
 	
 	@Override
 	protected void preRender(Texture input) {
-		AppHandler.blurShader.useShader();
+		shader = AppHandler.mainApp.renderEngine.getShader("blurShader");
+		shader.bind();
+		shader.loadUpVec2("dir", new Vector2f(dirX, dirY));
+		shader.loadUpFloat("radius", radius);
+		shader.loadUpVec2("resolution", new Vector2f(input.getWidth(),input.getHeight()));
 
-		AppHandler.blurShader.setDir(dirX, dirY);
-		AppHandler.blurShader.setRadius(radius);
-		AppHandler.blurShader.setResolution(input.getWidth(),input.getHeight());
 	}
 
 	public float getRadius() {

@@ -16,10 +16,7 @@ public class AmbientLight {
 	private Shader ambientShader;
 	public AmbientLight(){
 		lightInt = new Color(0,0,0);
-		if(AppHandler.mainApp.renderEngine.getShader("ambientShader")==null){
-			AppHandler.mainApp.renderEngine.addShader("ambientShader", new Shader("res/shaders/forAmbient.vert", "res/shaders/forAmbient.frag"));
-		}
-		ambientShader = AppHandler.mainApp.renderEngine.getShader("ambientShader");
+		ambientShader = AppHandler.mainApp.renderEngine.loadShader("ambientShader", "res/shaders/forAmbient.vert", "res/shaders/forAmbient.frag");
 	}
 	
 	public void updateLight(Camera cam){

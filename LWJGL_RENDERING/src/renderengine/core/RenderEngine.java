@@ -33,6 +33,7 @@ import renderengine.light.Light;
 import renderengine.model.Model;
 import renderengine.model.Models;
 import renderengine.model.SkyBox;
+import renderengine.shader.Shader;
 import renderengine.texture.Texture;
 public class RenderEngine {
 	private GUIComponent root;
@@ -112,6 +113,13 @@ public class RenderEngine {
 	}
 	public void addEffect(Efect efect) {
 		efects.add(efect);
+	}
+	
+	public Shader loadShader(String name,String vertexShaderFile,String fragmentShaderFile){
+		if(shaders.get(name)==null){
+			shaders.put(name, new Shader(vertexShaderFile, fragmentShaderFile));
+		}
+		return shaders.get(name);
 	}
 	
 	public void cleanUp(){

@@ -1,24 +1,25 @@
 package renderengine.efects;
 
 import renderengine.core.AppHandler;
+import renderengine.shader.Shader;
 import renderengine.texture.Texture;
 
 public class GrayScaleEfect extends Efect{
-
+	private Shader shader;
 	public GrayScaleEfect(boolean finalRender) {
 		super(finalRender);
-		// TODO Auto-generated constructor stub
+		shader = AppHandler.mainApp.renderEngine.loadShader("grayScaleShader", "res/shaders/GrayScale.vert", "res/shaders/GrayScale.frag");
 	}
 
 	@Override
 	protected void afterReder() {
-		AppHandler.grayScale.unbindShader();
+		shader.unbind();
 		
 	}
 
 	@Override
 	protected void preRender(Texture input) {
-		AppHandler.grayScale.useShader();
+		shader.bind();
 		input.bind();
 		
 	}

@@ -34,22 +34,16 @@ public class SpotLight extends Light{
 		this.dirY = dirY;
 		this.dirZ = dirZ;
 		shadowInfo = new ShadowInfo(Window.getW(),Window.getH());
-		if(AppHandler.mainApp.renderEngine.getShader("spotShader")==null){
-			
-			AppHandler.mainApp.renderEngine.addShader("spotShader", new Shader("res/shaders/forSpot.vert", "res/shaders/forSpot.frag"));
-		}
-		if(AppHandler.mainApp.renderEngine.getShader("shadowShader")==null){
-			AppHandler.mainApp.renderEngine.addShader("shadowShader", new Shader("res/shaders/shadowMap.vert", "res/shaders/shadowMap.frag"));
-		}
+		shader = AppHandler.mainApp.renderEngine.loadShader("spotShader", "res/shaders/forSpot.vert", "res/shaders/forSpot.frag");
+		shadow = AppHandler.mainApp.renderEngine.loadShader("shadowShader", "res/shaders/shadowMap.vert", "res/shaders/shadowMap.frag");
 		
-		shader = AppHandler.mainApp.renderEngine.getShader("spotShader");
+		
 		
 		shader.bind();
 		shader.loadUpInt("textureSampler", 0);
 		shader.loadUpInt("shadowMap", 1);
 		shader.unbind();
 	
-		shadow = AppHandler.mainApp.renderEngine.getShader("shadowShader");
 	}
 	
 	public SpotLight(Color color, float x, float y, float z,float dirX,float dirY,float dirZ,float attenuationConst,float attenuationLinear,float attenuationExp,float cutoff) {
@@ -64,22 +58,18 @@ public class SpotLight extends Light{
 		this.dirY = dirY;
 		this.dirZ = dirZ;
 		shadowInfo = new ShadowInfo(Window.getW(),Window.getH());
-		if(AppHandler.mainApp.renderEngine.getShader("spotShader")==null){
-			
-			AppHandler.mainApp.renderEngine.addShader("spotShader", new Shader("res/shaders/forSpot.vert", "res/shaders/forSpot.frag"));
-		}
-		if(AppHandler.mainApp.renderEngine.getShader("shadowShader")==null){
-			AppHandler.mainApp.renderEngine.addShader("shadowShader", new Shader("res/shaders/shadowMap.vert", "res/shaders/shadowMap.frag"));
-		}
 		
-		shader = AppHandler.mainApp.renderEngine.getShader("spotShader");
+		shader = AppHandler.mainApp.renderEngine.loadShader("spotShader", "res/shaders/forSpot.vert", "res/shaders/forSpot.frag");
+		shadow = AppHandler.mainApp.renderEngine.loadShader("shadowShader", "res/shaders/shadowMap.vert", "res/shaders/shadowMap.frag");
+		
+		
 		
 		shader.bind();
 		shader.loadUpInt("textureSampler", 0);
 		shader.loadUpInt("shadowMap", 1);
 		shader.unbind();
 	
-		shadow = AppHandler.mainApp.renderEngine.getShader("shadowShader");
+		
 	}
 	private Vector3f buffer;
 	@Override

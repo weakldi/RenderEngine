@@ -14,6 +14,7 @@ import renderengine.core.FlyCamera;
 import renderengine.core.MainApplication;
 import renderengine.core.Transformation;
 import renderengine.efects.BloomEfect;
+import renderengine.efects.BlurEfect;
 import renderengine.efects.FXAAEfect;
 import renderengine.efects.GrayScaleEfect;
 import renderengine.gui.TextField;
@@ -94,7 +95,8 @@ public class TestShadowMap extends MainApplication{
 			msg.setY(0.85f);
 			msg.setScaleX(0.5f);
 			msg.setScaleY(0.125f);
-//			new BloomEfect(true);
+
+			
 		}
 		
 		@Override

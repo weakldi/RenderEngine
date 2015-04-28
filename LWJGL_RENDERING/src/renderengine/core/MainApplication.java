@@ -16,10 +16,7 @@ import renderengine.shader.FXAAShader;
 import renderengine.shader.ForDiractionalShader;
 import renderengine.shader.GUIShader;
 import renderengine.shader.GUITextureAtlasShader;
-import renderengine.shader.GaussBlurShader;
-import renderengine.shader.GrayScaleShader;
 import renderengine.shader.MixShader;
-import renderengine.shader.SkyBoxShader;
 
 
 public abstract class MainApplication {
@@ -61,12 +58,12 @@ public abstract class MainApplication {
 		cam = new Camera(Window.getW(),Window.getH());
 		
 		AppHandler.diractionalShader = new ForDiractionalShader();
-		AppHandler.skyShader = new SkyBoxShader();
+		
 		AppHandler.guiShader = new GUIShader();
 		AppHandler.fxaaShader = new FXAAShader();
-		AppHandler.blurShader = new GaussBlurShader();
+		
 		AppHandler.textShader = new GUITextureAtlasShader();
-		AppHandler.grayScale = new GrayScaleShader();
+		
 		AppHandler.bloomeOne = new BloomPassOneShader();
 		AppHandler.mixShader = new MixShader();
 		rootComponent = new GameComponent() {
@@ -146,14 +143,14 @@ public abstract class MainApplication {
 		
 		AppHandler.diractionalShader.deleteShader();
 		
-		AppHandler.skyShader.deleteShader();
+		
 		
 
 		AppHandler.guiShader.deleteShader();
 		AppHandler.fxaaShader.deleteShader();
-		AppHandler.blurShader.deleteShader();
+	
 		AppHandler.textShader.deleteShader();	
-		AppHandler.grayScale.deleteShader();
+		
 		AppHandler.bloomeOne.deleteShader();
 		AppHandler.mixShader.deleteShader();
 		renderEngine.cleanUp();
