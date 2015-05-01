@@ -1,11 +1,6 @@
 package renderengine.test;
 
 
-import java.io.File;
-import java.io.IOException;
-
-import javax.imageio.ImageIO;
-
 import org.lwjgl.util.vector.Vector3f;
 
 import renderengine.core.Color;
@@ -13,10 +8,8 @@ import renderengine.core.Entity;
 import renderengine.core.FlyCamera;
 import renderengine.core.MainApplication;
 import renderengine.core.Transformation;
-import renderengine.efects.BloomEfect;
-import renderengine.efects.BlurEfect;
+import renderengine.core.Window;
 import renderengine.efects.FXAAEfect;
-import renderengine.efects.GrayScaleEfect;
 import renderengine.gui.TextField;
 import renderengine.input.Keyboard;
 import renderengine.input.Mouse;
@@ -26,7 +19,6 @@ import renderengine.model.Model;
 import renderengine.model.OBJLoader;
 import renderengine.model.Plane;
 import renderengine.model.Quader;
-import renderengine.model.Terrain;
 import renderengine.texture.Texture;
 
 public class TestShadowMap extends MainApplication{
@@ -42,14 +34,14 @@ public class TestShadowMap extends MainApplication{
 		@Override
 		protected void updateApp(float tslf) {
 			lastPos+=tslf*0.25f;
-			quader.rotate(0, 0, 0, 0, (float) Math.sin(lastPos)*0.25f, 0);
+			quader.setRotation(0, 0, 0, 0, (float) Math.sin(lastPos)*90f, 0);
 			if(Keyboard.isKeyPressed(Keyboard.KEY_L)){
 				cam.lookAt(new Vector3f(s.getX(), s.getY(), s.getZ()), new Vector3f(s.getDirX(), s.getDirY(), s.getDirZ()), new Vector3f(0, 1, 0));	
-				
 			}else{
 				player.setTranslation(cam.getX(), 0, cam.getZ());
 				player.setRotation(0,-cam.getrY(), 0);
 			}
+			System.out.println(tslf);
 			c.setSpeed(c.getSpeed()+Mouse.getWheelRot()*0.01f);
 			if(c.getSpeed()>100)
 				c.setSpeed(100);
@@ -65,7 +57,7 @@ public class TestShadowMap extends MainApplication{
 			Model m = OBJLoader.loadOBJ("res/models/affe.obj");
 			ambientLight.setLightInt(new Color(0.1f,0.1f,0.1f));
 			Quader q = new Quader(1, 1, 1);
-			quader = new Entity(new Transformation(-0, 0.5f, -20), m.getModelID());
+			quader = new Entity(new Transformation(-0, 0, -20), m.getModelID());
 			quader.setColor(0.5f, 1, 0.25f);
 			quader.getMat().setSpecularExponent(128);
 			quader.getMat().setSpecularIntensity(10);
@@ -95,7 +87,7 @@ public class TestShadowMap extends MainApplication{
 			msg.setY(0.85f);
 			msg.setScaleX(0.5f);
 			msg.setScaleY(0.125f);
-
+			Window.setFPS(10000);
 			
 		}
 		

@@ -11,6 +11,7 @@ import renderengine.core.AppHandler;
 import renderengine.core.Matrix;
 import renderengine.core.VAO;
 import renderengine.core.Window;
+import renderengine.shader.Shader;
 import renderengine.texture.Texture;
 
 public class GUIComponent {
@@ -23,7 +24,7 @@ public class GUIComponent {
 	protected float scaleY = 1;
 	protected float x = 0,y = 0;
 	protected float rot = 0;
-	
+	protected Shader shader;
 	private static float[] pos = new float[]{
 		-1,1, -1,-1, 1,1, 1,-1
 	};
@@ -42,6 +43,7 @@ public class GUIComponent {
 			AppHandler.mainApp.getRenderEngine().getRoot().addChild(this);
 		}
 		
+		shader = AppHandler.mainApp.renderEngine.loadShader("guiShader", "res/shaders/guiShader.vert", "res/shaders/guiShader.frag");
 	}
 	public GUIComponent() {
 		children = new ArrayList<GUIComponent>();
@@ -49,6 +51,7 @@ public class GUIComponent {
 		if(quad == null){
 			genVAO();
 		}
+		shader = AppHandler.mainApp.getRenderEngine().loadShader("guiShader", "res/shaders/guiShader.vert", "res/shaders/guiShader.frag");
 		AppHandler.mainApp.getRenderEngine().getRoot().addChild(this);
 	}
 	
@@ -59,10 +62,11 @@ public class GUIComponent {
 	}
 	
 	public void render(){
-
+		
 		
 		if(texture!=null){
-			AppHandler.guiShader.loadModelMat(getTransMat());
+			
+			shader.loadUpMat4("modelMat", getTransMat());
 			quad.bind();
 			texture.bind();
 			GL11.glDrawArrays(GL11.GL_TRIANGLE_STRIP, 0, 4);
@@ -75,12 +79,13 @@ public class GUIComponent {
 	}
 	public void renderAll(){
 		update();
-		AppHandler.guiShader.useShader();
+		shader = AppHandler.mainApp.getRenderEngine().getShader("guiShader");
+		shader.bind();
 		render();
 		for (GUIComponent child : children) {
 			child.renderAll();
 		}
-		AppHandler.guiShader.unbindShader();
+		shader.unbind();
 	}
 
 	

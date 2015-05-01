@@ -5,8 +5,11 @@ import java.util.HashMap;
 import java.util.List;
 
 import javax.swing.JComponent;
+import javax.swing.JFrame;
 
+import org.lwjgl.LWJGLException;
 import org.lwjgl.opengl.APPLEObjectPurgeable;
+import org.lwjgl.opengl.AWTGLCanvas;
 
 import renderengine.core.MainApplication;
 
@@ -29,11 +32,17 @@ public class Tester extends javax.swing.JFrame {
      */
     public Tester() {
     	apps.put("Shadowmap",new TestShadowMap(800, 600));
-    	apps.put("OBJLoader",new TestOBJLoader(800, 600));
+    	apps.put("OBJLoader",new TestOBJLoader(new OBJLoaderFrame()));
     	apps.put("Bloom", new TestBloom());
     	apps.put("Terrain", new TestTerrain());
+    	try {
+			apps.put("SwingApp", new TestSwingApp(new AWTGLCanvas(),new JFrame()));
+		} catch (LWJGLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
         initComponents();
-       
+        
     }
 
     /**

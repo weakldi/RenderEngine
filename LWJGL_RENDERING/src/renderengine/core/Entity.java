@@ -50,5 +50,11 @@ public class Entity extends GameComponent{
 	public void setTexture(Texture texture) {
 		this.mat.setTexture(texture);
 	}
+
+	public void setModelID(int modelID) {
+		Models.removeEntity(this);
+		this.modelID = modelID;
+		Models.addEntity(this);
+	}
 	
 }

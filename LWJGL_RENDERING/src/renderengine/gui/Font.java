@@ -2,27 +2,33 @@ package renderengine.gui;
 
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.vector.Matrix4f;
+import org.lwjgl.util.vector.Vector2f;
+import org.lwjgl.util.vector.Vector3f;
 
 import renderengine.core.AppHandler;
 import renderengine.core.Color;
 import renderengine.core.Matrix;
 import renderengine.core.VAO;
+import renderengine.shader.Shader;
 import renderengine.texture.Texture;
 
 public class Font {
 	private Texture texture;
-	
+	private Shader shader;
 	public Font() {
 		this.texture = new Texture("res/textures/font.png");
 		if(quad==null){
 			genVAO();
 		}
+		shader = AppHandler.mainApp.renderEngine.loadShader("guiTextureAtlasShader", "res/shaders/GUITextureAtlasShader.vert", "res/shaders/GUITextureAtlasShader.frag");
 	}
 	public Font(Texture texture) {
 		this.texture = texture;
 		if(quad==null){
 			genVAO();
 		}
+		shader = AppHandler.mainApp.renderEngine.loadShader("guiTextureAtlasShader", "res/shaders/GUITextureAtlasShader.vert", "res/shaders/GUITextureAtlasShader.frag");
+
 	}
 	private static VAO quad;
 	private static float[] pos = new float[]{
@@ -57,20 +63,19 @@ public class Font {
 	}
 	Matrix mat = new Matrix();
 	public void drawTextM(String text,float x,float y,float sizeX,float sizeY,Color c){
-		AppHandler.textShader.useShader();
-		AppHandler.textShader.loadUpRows(16);
-	
 		x = x-text.length()/2f*sizeX;
+		shader.bind();
+		shader.loadUpFloat("rows", 16);
 		texture.bind();
 		quad.bind();
 		for (int i = 0; i < text.length(); i++) {
 			mat.setIdentity();
 			mat.translate(x, y, 0);
 			mat.scale(sizeX, sizeY, 0);
-			AppHandler.textShader.loadModelMat(mat);
+			shader.loadUpMat4("modelMat", mat);
+			shader.loadUpVec3("color", new Vector3f(c.getR(),c.getG(),c.getB()));
+			shader.loadUpVec2("offset", new Vector2f(getXOffset((int) text.charAt(i)), getYOffset((int) text.charAt(i))));
 			
-			AppHandler.textShader.loadUpColor(c.getR(),c.getG(),c.getB());
-			AppHandler.textShader.loadOffset(getXOffset((int) text.charAt(i)), getYOffset((int) text.charAt(i)));
 			GL11.glDrawArrays(GL11.GL_TRIANGLE_STRIP, 0, 4);
 
 			x+=sizeX;
@@ -80,9 +85,11 @@ public class Font {
 	}
 	
 	public void drawTextM(String text,float x,float y,float sizeX,float sizeY,Matrix parent,Color c){
-		AppHandler.textShader.useShader();
-		AppHandler.textShader.loadUpRows(16);
 		x = x-text.length()/2f*sizeX;
+		
+		shader.bind();
+		shader.loadUpFloat("rows", 16);
+		
 		texture.bind();
 		quad.bind();
 		for (int i = 0; i < text.length(); i++) {
@@ -91,9 +98,10 @@ public class Font {
 			mat.translate(x, y, 0);
 			mat.scale(sizeX, sizeY, 0);
 
-			AppHandler.textShader.loadModelMat(mat);
-			AppHandler.textShader.loadUpColor(c.getR(),c.getG(),c.getB());
-			AppHandler.textShader.loadOffset(getXOffset((int) text.charAt(i)), getYOffset((int) text.charAt(i)));
+			shader.loadUpMat4("modelMat", mat);
+			shader.loadUpVec3("color", new Vector3f(c.getR(),c.getG(),c.getB()));
+			shader.loadUpVec2("offset", new Vector2f(getXOffset((int) text.charAt(i)), getYOffset((int) text.charAt(i))));
+			
 			GL11.glDrawArrays(GL11.GL_TRIANGLE_STRIP, 0, 4);
 			x+=sizeX;
 		}
@@ -102,17 +110,18 @@ public class Font {
 	}
 	
 	public void drawTextL(String text,float x,float y,float sizeX,float sizeY,Color c){
-		AppHandler.textShader.useShader();
-		AppHandler.textShader.loadUpRows(16);
+		shader.bind();
+		shader.loadUpFloat("rows", 16);
 		texture.bind();
 		quad.bind();
-				for (int i = 0; i < text.length(); i++) {
+		for (int i = 0; i < text.length(); i++) {
 			mat.setIdentity();
 			mat.translate(x, y, 0);
 			mat.scale(sizeX, sizeY, 0);
-			AppHandler.textShader.loadModelMat(mat);
-			AppHandler.textShader.loadUpColor(c.getR(),c.getG(),c.getB());
-			AppHandler.textShader.loadOffset(getXOffset((int) text.charAt(i)), getYOffset((int) text.charAt(i)));
+			shader.loadUpMat4("modelMat", mat);
+			shader.loadUpVec3("color", new Vector3f(c.getR(),c.getG(),c.getB()));
+			shader.loadUpVec2("offset", new Vector2f(getXOffset((int) text.charAt(i)), getYOffset((int) text.charAt(i))));
+			
 			GL11.glDrawArrays(GL11.GL_TRIANGLE_STRIP, 0, 4);
 
 			x+=sizeX;
@@ -122,18 +131,21 @@ public class Font {
 	}
 	
 	public void drawTextL(String text,float x,float y,float sizeX,float sizeY,Matrix parent,Color c){
-		AppHandler.textShader.useShader();
-		AppHandler.textShader.loadUpRows(16);
+		shader.bind();
+		shader.loadUpFloat("rows", 16);
+		
 		texture.bind();
 		quad.bind();
 		for (int i = 0; i < text.length(); i++) {
-			
+		
 			mat.getMatGL().load(parent.getMatGL());
 			mat.translate(x, y, 0);
 			mat.scale(sizeX, sizeY, 0);
-			AppHandler.textShader.loadModelMat(mat);
-			AppHandler.textShader.loadUpColor(c.getR(),c.getG(),c.getB());
-			AppHandler.textShader.loadOffset(getXOffset((int) text.charAt(i)), getYOffset((int) text.charAt(i)));
+
+			shader.loadUpMat4("modelMat", mat);
+			shader.loadUpVec3("color", new Vector3f(c.getR(),c.getG(),c.getB()));
+			shader.loadUpVec2("offset", new Vector2f(getXOffset((int) text.charAt(i)), getYOffset((int) text.charAt(i))));
+			
 			GL11.glDrawArrays(GL11.GL_TRIANGLE_STRIP, 0, 4);
 			x+=sizeX;
 		}
@@ -142,18 +154,20 @@ public class Font {
 	}
 	
 	public void drawTextR(String text,float x,float y,float sizeX,float sizeY,Color c){
-		AppHandler.textShader.useShader();
-		AppHandler.textShader.loadUpRows(16);
+
 		x = x-text.length()*sizeX;
+		shader.bind();
+		shader.loadUpFloat("rows", 16);
 		texture.bind();
 		quad.bind();
 		for (int i = 0; i < text.length(); i++) {
 			mat.setIdentity();
 			mat.translate(x, y, 0);
 			mat.scale(sizeX, sizeY, 0);
-			AppHandler.textShader.loadModelMat(mat);
-			AppHandler.textShader.loadUpColor(c.getR(),c.getG(),c.getB());
-			AppHandler.textShader.loadOffset(getXOffset((int) text.charAt(i)), getYOffset((int) text.charAt(i)));
+			shader.loadUpMat4("modelMat", mat);
+			shader.loadUpVec3("color", new Vector3f(c.getR(),c.getG(),c.getB()));
+			shader.loadUpVec2("offset", new Vector2f(getXOffset((int) text.charAt(i)), getYOffset((int) text.charAt(i))));
+			
 			GL11.glDrawArrays(GL11.GL_TRIANGLE_STRIP, 0, 4);
 
 			x+=sizeX;
@@ -163,19 +177,22 @@ public class Font {
 	}
 	
 	public void drawTextR(String text,float x,float y,float sizeX,float sizeY,Matrix parent,Color c){
-		AppHandler.textShader.useShader();
-		AppHandler.textShader.loadUpRows(16);
 		x = x-text.length()*sizeX;
+		shader.bind();
+		shader.loadUpFloat("rows", 16);
+		
 		texture.bind();
 		quad.bind();
 		for (int i = 0; i < text.length(); i++) {
-			
+		
 			mat.getMatGL().load(parent.getMatGL());
 			mat.translate(x, y, 0);
 			mat.scale(sizeX, sizeY, 0);
-			AppHandler.textShader.loadUpColor(c.getR(),c.getG(),c.getB());
-			AppHandler.textShader.loadModelMat(mat);
-			AppHandler.textShader.loadOffset(getXOffset((int) text.charAt(i)), getYOffset((int) text.charAt(i)));
+
+			shader.loadUpMat4("modelMat", mat);
+			shader.loadUpVec3("color", new Vector3f(c.getR(),c.getG(),c.getB()));
+			shader.loadUpVec2("offset", new Vector2f(getXOffset((int) text.charAt(i)), getYOffset((int) text.charAt(i))));
+			
 			GL11.glDrawArrays(GL11.GL_TRIANGLE_STRIP, 0, 4);
 			x+=sizeX;
 		}

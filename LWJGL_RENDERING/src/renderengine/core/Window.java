@@ -1,5 +1,7 @@
 package renderengine.core;
 
+import java.awt.Canvas;
+
 import org.lwjgl.LWJGLException;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
@@ -12,7 +14,7 @@ public class Window {
 	private static int h;
 	private static boolean updateCams = false;
 	private static int FPS = 60;
-	
+	private static boolean canvas = false;
 	private static int samples = 16;
 	public static void createWindow(int w,int h){
 		Window.w = w;
@@ -24,6 +26,19 @@ public class Window {
 			e.printStackTrace();
 			System.exit(1);
 		}
+	}
+	
+	public static void createWindow(Canvas c){
+		Window.w = c.getWidth();
+		Window.h = c.getHeight();
+		try {
+			Display.setParent(c);
+			Display.create(new PixelFormat(32, 0, 24, 0, 0));
+		} catch (LWJGLException e) {
+			e.printStackTrace();
+			System.exit(1);
+		}
+		canvas = true;
 	}
 	
 	public static void bindAsRenderTarget(){
@@ -72,19 +87,23 @@ public class Window {
 	public static void setW(int w) {
 		Window.w = w;
 		updateCams = true;
-		updateDisplayMode();
+		if(!canvas)
+			updateDisplayMode();
 	}
 
 	public static void setH(int h) {
 		Window.h = h;
 		updateCams = true;
-		updateDisplayMode();
+		if(!canvas)
+			updateDisplayMode();
 	}
 	
 	public static void setDisplayMode(int w,int h){
 		Window.w = w;
 		Window.h = h;
-		
+		updateCams = true;
+		if(!canvas)
+			updateDisplayMode();
 	}
 	
 	public static void updateDisplayMode(){

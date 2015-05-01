@@ -1,7 +1,15 @@
 package renderengine.core;
 
+import java.awt.Canvas;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowStateListener;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.swing.JFrame;
 
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
@@ -11,12 +19,7 @@ import renderengine.light.AmbientLight;
 import renderengine.light.Light;
 import renderengine.model.Model;
 import renderengine.model.SkyBox;
-import renderengine.shader.BloomPassOneShader;
-import renderengine.shader.FXAAShader;
 import renderengine.shader.ForDiractionalShader;
-import renderengine.shader.GUIShader;
-import renderengine.shader.GUITextureAtlasShader;
-import renderengine.shader.MixShader;
 
 
 public abstract class MainApplication {
@@ -30,10 +33,12 @@ public abstract class MainApplication {
 	protected SkyBox sky = null;
 	protected List<Camera> cams;
 	private int w,h;
+	private Canvas c = null;
+	private JFrame f = null;
 	public GameComponent rootComponent;
 	
 	public MainApplication(){
-		this(800,600);
+		this(800,600); 
 	}
 	public MainApplication(int w,int h){
 		this.w = w;
@@ -45,12 +50,40 @@ public abstract class MainApplication {
 		run = false;
 	}
 	
+	public MainApplication(final Canvas c,final JFrame f){
+		this.c = c;
+		this.f = f;
+		f.setResizable(false);
+		f.addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent e) {
+				super.windowClosing(e);
+				f.dispose();
+				stop();
+			}
+			
+		});
+		
+		this.w = c.getWidth();
+		this.h = c.getHeight();
+		models = new ArrayList<Model>();
+		
+		lights = new ArrayList<>();
+		cams = new ArrayList<>();
+		run = false;
+	}
+	
 	private void init(){
 		
 		
 		NativeLoader.loadNatives();
-		Window.createWindow(w, h);
-		
+		if(c==null)
+			Window.createWindow(w, h);
+		else{
+			f.setVisible(true);
+			Window.createWindow(c);
+		}
+			
 		GLUtil.initGL();
 		AppHandler.mainApp = this;
 		renderEngine = new RenderEngine();
@@ -59,13 +92,7 @@ public abstract class MainApplication {
 		
 		AppHandler.diractionalShader = new ForDiractionalShader();
 		
-		AppHandler.guiShader = new GUIShader();
-		AppHandler.fxaaShader = new FXAAShader();
 		
-		AppHandler.textShader = new GUITextureAtlasShader();
-		
-		AppHandler.bloomeOne = new BloomPassOneShader();
-		AppHandler.mixShader = new MixShader();
 		rootComponent = new GameComponent() {
 			
 			@Override
@@ -111,7 +138,9 @@ public abstract class MainApplication {
 			renderengine.input.Mouse.reset();
 		}
 		cleanUP();
-		Window.close();
+		if(f==null)
+			Window.close();
+		
 	}
 	
 	private void update(float tslf) {
@@ -146,13 +175,11 @@ public abstract class MainApplication {
 		
 		
 
-		AppHandler.guiShader.deleteShader();
-		AppHandler.fxaaShader.deleteShader();
-	
-		AppHandler.textShader.deleteShader();	
 		
-		AppHandler.bloomeOne.deleteShader();
-		AppHandler.mixShader.deleteShader();
+	
+		
+		
+		
 		renderEngine.cleanUp();
 		for (int i = 0; i < models.size(); i++) {
 			models.get(i).delete();
@@ -240,5 +267,17 @@ public abstract class MainApplication {
 	}
 	public void setH(int h) {
 		this.h = h;
+	}
+	public Canvas getC() {
+		return c;
+	}
+	public void setC(Canvas c) {
+		this.c = c;
+	}
+	public JFrame getF() {
+		return f;
+	}
+	public void setF(JFrame f) {
+		this.f = f;
 	}
 }

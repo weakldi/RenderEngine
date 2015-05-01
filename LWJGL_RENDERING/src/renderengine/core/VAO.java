@@ -66,9 +66,7 @@ public class VAO {
 	
 	
 	private void addVbo(int attrib,int id){
-		if(attrib >= 0 && attrib < 16){
-			System.out.println(id + " " + attrib);
-			
+		if(attrib >= 0 && attrib < 16){			
 			vboIDs[attrib] = id;
 		}
 	}
@@ -103,7 +101,6 @@ public class VAO {
 		glBindVertexArray(ID);
 		for (int i = 0; i < vboIDs.length; i++) {
 			if(vboIDs[i]!=0){
-				
 				glEnableVertexAttribArray(i);
 			}
 		}

@@ -42,7 +42,6 @@ public class RenderEngine {
 	private List<Efect> efects;
 	private HashMap<String, renderengine.shader.Shader> shaders;
 	public RenderEngine() {
-		root = new GUIComponent(true);
 		efects = new ArrayList<Efect>();
 		shaders = new HashMap<>();
 		
@@ -64,6 +63,9 @@ public class RenderEngine {
 	 
 	 
 	public void render(Camera cam,List<Model> models,AmbientLight ambientLight,List<Light> lights){
+		if(root==null){
+			root = new GUIComponent(true);
+		}
 		createShadowMaps(lights, models);
 		renderScene(cam, models, ambientLight, lights);
 		finalRender();
@@ -77,6 +79,13 @@ public class RenderEngine {
 		shaders.replace(name, shader);
 	}
 	public renderengine.shader.Shader getShader(String name){
+		return shaders.get(name);
+	}
+	
+	public Shader loadShader(String name,String vertexShaderFile,String fragmentShaderFile){
+		if(shaders.get(name)==null){
+			shaders.put(name, new Shader(vertexShaderFile, fragmentShaderFile));
+		}
 		return shaders.get(name);
 	}
 	public void render(Camera cam,List<Model> models,AmbientLight ambientLight,List<Light> lights,SkyBox sky){
@@ -109,18 +118,16 @@ public class RenderEngine {
 		
 	}
 	public GUIComponent getRoot() {
+		if(root==null){
+			root = new GUIComponent(true);
+		}
 		return root;
 	}
 	public void addEffect(Efect efect) {
 		efects.add(efect);
 	}
 	
-	public Shader loadShader(String name,String vertexShaderFile,String fragmentShaderFile){
-		if(shaders.get(name)==null){
-			shaders.put(name, new Shader(vertexShaderFile, fragmentShaderFile));
-		}
-		return shaders.get(name);
-	}
+	
 	
 	public void cleanUp(){
 		for(String name : shaders.keySet())
@@ -158,14 +165,17 @@ public class RenderEngine {
 		for (Efect efect : efects) {
 			if (buffer1asTarget) {
 				efect.renderEfect(buffer1, buffer2);
+				
 			}else{
 				efect.renderEfect(buffer2, buffer1);
+				
 			}
 			buffer1asTarget = !buffer1asTarget;
 		}
 		if(efects.size()==0){
 			root.setTexture(buffer1);
-		}else if (buffer1asTarget) {
+		}
+		else if (buffer1asTarget) {
 			root.setTexture(buffer2);
 		}else{
 			root.setTexture(buffer1);
@@ -229,6 +239,8 @@ public class RenderEngine {
 		buffer1.unbindFrambuffer();
 		
 	}
+	
+	
 	
 	
 }

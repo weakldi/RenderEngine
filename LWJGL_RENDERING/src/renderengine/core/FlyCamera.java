@@ -7,7 +7,7 @@ import renderengine.input.Mouse;
 
 public class FlyCamera extends Camera{
 	private float speed = 100;
-	private float rotSpeed = 10;
+	private float rotSpeed = 30;
 	public FlyCamera(float w, float h) {
 		super(w, h);
 		Keyboard.addKey(Keyboard.KEY_W);
@@ -35,6 +35,8 @@ public class FlyCamera extends Camera{
 		}
 		rY+=Mouse.getDx()*rotSpeed*tslf;
 		rX+= Mouse.getDy()*rotSpeed*tslf*-1;
+		if(rX<-90)rX=-90;
+		if(rX>90)rX=90;
 			if(Keyboard.isKeyPressed(Keyboard.KEY_W))
 			{
 				

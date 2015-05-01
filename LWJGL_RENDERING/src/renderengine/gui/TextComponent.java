@@ -7,7 +7,6 @@ import renderengine.core.AppHandler;
 import renderengine.core.Color;
 import renderengine.core.Matrix;
 import renderengine.core.VAO;
-import renderengine.shader.GUIShader;
 import renderengine.texture.Texture;
 
 public class TextComponent extends GUIComponent{
