@@ -10,12 +10,13 @@ import static org.lwjgl.opengl.GL11.glClear;
 import static org.lwjgl.opengl.GL11.glClearColor;
 import static org.lwjgl.opengl.GL11.glCullFace;
 import static org.lwjgl.opengl.GL11.glEnable;
+import static org.lwjgl.opengl.GL13.GL_TEXTURE_CUBE_MAP;
 import static org.lwjgl.opengl.GL32.GL_DEPTH_CLAMP;
-
 public class GLUtil {
 	public static void initGL(){
 		glEnable(GL_DEPTH_TEST);
 		glEnable(GL_TEXTURE_2D);
+		glEnable(GL_TEXTURE_CUBE_MAP);
 		glEnable(GL_CULL_FACE);
 		glEnable(GL_DEPTH_CLAMP);
 		glCullFace(GL_BACK);

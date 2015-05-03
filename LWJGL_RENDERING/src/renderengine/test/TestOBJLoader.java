@@ -1,20 +1,18 @@
 package renderengine.test;
 
-import org.lwjgl.LWJGLException;
-import org.lwjgl.opengl.AWTGLCanvas;
-import org.lwjgl.opengl.Display;
-
 import renderengine.core.Color;
 import renderengine.core.Entity;
 import renderengine.core.FlyCamera;
 import renderengine.core.MainApplication;
 import renderengine.core.Transformation;
+import renderengine.efects.FXAAEfect;
 import renderengine.light.PointLight;
+import renderengine.light.SpotLight;
 import renderengine.model.Model;
 import renderengine.model.Models;
 import renderengine.model.OBJLoader;
-import renderengine.model.Plane;
 import renderengine.model.Quader;
+import renderengine.model.SkyBox;
 import renderengine.texture.Texture;
 
 public class TestOBJLoader extends MainApplication{
@@ -25,16 +23,20 @@ public class TestOBJLoader extends MainApplication{
 	}
 	@Override
 	protected void initApp() {
-		light = new PointLight(new Color(1, 1f, 1), 0, 0, 0, 1, 0, 0,500);
+		ambientLight.setLightInt(new Color(0.3f,0.3f,0.3f));
+		light = new PointLight(new Color(1, 1, 1), 0, 0, 0, 1, 0, 0,500);
+		new PointLight(new Color(0.05f,0.05f,0.05f), 0, 10, -50, 1, 0, 0,300);
 		cam = new FlyCamera(getW(), getH());
 		cam.setZ(10);
 		cam.setX(10);
 		cam.setY(10);
+		cam.setrX(27);
+		cam.setrY(315);
+		obj = new Entity(new Transformation(0, 0, 0), OBJLoader.loadOBJ("res/models/tardisMain.obj").getModelID());
+		obj.setTexture(new Texture("res\\Textures\\TARDIS.png",Texture.FILTER_MIPMAP_NEAREST_NEAREST,false));
+		Entity e = new Entity(new Transformation(0, -10, 0, 0, 0, 0), new Quader(500,0.05f,500).getModelID());
 		
-		
-		obj = new Entity(new Transformation(0, 0, 0), new Quader().getModelID());
-		
-		new Entity(new Transformation(0, -30, 0, 0, 0, 0), new Quader(500,0.05f,500).getModelID()).setColor(0.25f, 0.5f, 0.75f);
+		new FXAAEfect(true);
 	}
 
 	@Override
@@ -68,7 +70,7 @@ public class TestOBJLoader extends MainApplication{
 			double rZ = (Double)f.getRotZ().getValue();
 			Color modelColor = new Color(f.getModelC().getRed(),f.getModelC().getGreen(),f.getModelC().getBlue());
 			Color lightColor = new Color(f.getLightC().getRed(),f.getLightC().getGreen(),f.getLightC().getBlue());
-			System.out.println(f.getScaleY().getValue());
+			
 			obj.setScale((float)sX, (float)sY, (float)sZ);
 			obj.setRotation((float)rX, (float)rY, (float)rZ);
 			obj.setColor(modelColor);
@@ -76,13 +78,11 @@ public class TestOBJLoader extends MainApplication{
 			light.setColor(lightColor);
 			f.update = false;
 		}
-		System.out.println(cam.getrX());
-		System.out.println(cam.getrY());
+		
 	}
 
 	@Override
 	protected void exit() {
-		
 		
 	}
 

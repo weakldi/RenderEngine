@@ -1,92 +1,37 @@
 package renderengine.model;
 
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL13;
+
+import renderengine.core.AppHandler;
 import renderengine.core.Camera;
+import renderengine.core.Matrix;
 import renderengine.core.VAO;
+import renderengine.shader.Shader;
+import renderengine.texture.TextureLoader;
 public class SkyBox {
-	private VAO cube;
-
-	private int TextureID;
-	private float[] vert;
-	private int[] ind;
-	
-	private static final float SIZE = 500f;
-	
-	private static final float[] VERTICES = {        
-	    -SIZE,  SIZE, -SIZE,
-	    -SIZE, -SIZE, -SIZE,
-	    SIZE, -SIZE, -SIZE,
-	     SIZE, -SIZE, -SIZE,
-	     SIZE,  SIZE, -SIZE,
-	    -SIZE,  SIZE, -SIZE,
-
-	    -SIZE, -SIZE,  SIZE,
-	    -SIZE, -SIZE, -SIZE,
-	    -SIZE,  SIZE, -SIZE,
-	    -SIZE,  SIZE, -SIZE,
-	    -SIZE,  SIZE,  SIZE,
-	    -SIZE, -SIZE,  SIZE,
-
-	     SIZE, -SIZE, -SIZE,
-	     SIZE, -SIZE,  SIZE,
-	     SIZE,  SIZE,  SIZE,
-	     SIZE,  SIZE,  SIZE,
-	     SIZE,  SIZE, -SIZE,
-	     SIZE, -SIZE, -SIZE,
-
-	    -SIZE, -SIZE,  SIZE,
-	    -SIZE,  SIZE,  SIZE,
-	     SIZE,  SIZE,  SIZE,
-	     SIZE,  SIZE,  SIZE,
-	     SIZE, -SIZE,  SIZE,
-	    -SIZE, -SIZE,  SIZE,
-
-	    -SIZE,  SIZE, -SIZE,
-	     SIZE,  SIZE, -SIZE,
-	     SIZE,  SIZE,  SIZE,
-	     SIZE,  SIZE,  SIZE,
-	    -SIZE,  SIZE,  SIZE,
-	    -SIZE,  SIZE, -SIZE,
-
-	    -SIZE, -SIZE, -SIZE,
-	    -SIZE, -SIZE,  SIZE,
-	     SIZE, -SIZE, -SIZE,
-	     SIZE, -SIZE, -SIZE,
-	    -SIZE, -SIZE,  SIZE,
-	     SIZE, -SIZE,  SIZE
-	};
-	
-	public SkyBox(int sIZE, int textureID) {
-		this.cube = new VAO();
-		
-		TextureID = textureID;
-		
-		
-		
-		cube.addData(VERTICES, 0, 3);
-		
-		
-		
+	private Quader q;
+	private float size;
+	private Shader shader;
+	private int texture;
+	public SkyBox(float size,String[] textures) {
+		q = new Quader(size, size, size);
+		this.size = size;
+		shader = AppHandler.mainApp.renderEngine.loadShader("skyShader", "res/shaders/skybox.vert", "res/shaders/skybox.frag");
+		texture = TextureLoader.loadCubeMap(textures);
 	}
 	
 	public void render(Camera cam){
-//		AppHandler.skyShader.useShader();
-//		AppHandler.skyShader.loadProjectionMat(cam.getProjectionMatrix());
-//		AppHandler.skyShader.loadViewMat(cam.getViewMatrix());
-//		GL11.glDisable(GL11.GL_CULL_FACE);
-//		glActiveTexture(GL_TEXTURE0);
-//		glBindTexture(GL_TEXTURE_CUBE_MAP, TextureID);
-//		cube.bind();
-//		glDrawArrays(GL_TRIANGLES, 0, VERTICES.length);
-//		cube.unBind();
-//		AppHandler.skyShader.unbindShader();
-	}
-	
-	
-	public int getTextureID() {
-		return TextureID;
-	}
-	public void setTextureID(int textureID) {
-		TextureID = textureID;
+		
+		shader.bind();
+		GL13.glActiveTexture(GL13.GL_TEXTURE0);
+		GL11.glBindTexture(GL13.GL_TEXTURE_CUBE_MAP, texture);
+		Matrix view = cam.getViewMatrix();
+		view.translate(cam.getX(), cam.getY(), cam.getZ());
+		shader.loadUpMat4("projMat", cam.getProjectionMatrix());
+		shader.loadUpMat4("viewMat", view);
+		q.render();
+		shader.unbind();
 	}
 	
 	

@@ -90,13 +90,15 @@ public class SpotLight extends Light{
 		shader.loadUpFloat("cutoff", cutoff);
 		buffer = new Vector3f(dirX, dirY, dirZ);
 		shader.loadUpVec3("spotDir", buffer);
-
+		
 		if(shadowInfo!=null){
 			shader.loadUpMat4("depthProjMat", shadowInfo.getCam().getProjectionMatrix());
 			shader.loadUpMat4("depthViewMat", shadowInfo.getCam().getViewMatrix());
+			shader.loadUpFloat("minShadowInt", 0.5f);
 		}else{
 			shader.loadUpMat4("depthProjMat", cam.getProjectionMatrix());
 			shader.loadUpMat4("depthViewMat", cam.getViewMatrix());
+			shader.loadUpFloat("minShadowInt",1f);
 		}
 		
 		

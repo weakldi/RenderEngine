@@ -91,30 +91,13 @@ public class RenderEngine {
 	public void render(Camera cam,List<Model> models,AmbientLight ambientLight,List<Light> lights,SkyBox sky){
 		
 		
-		GLUtil.clearScreen();
-		
-		Window.bindAsRenderTarget();
-		ambientLight.updateLight(cam);
-//		for (Model model : models) {
-//			ambientLight.renderModel(model);
-//		}
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_ONE, GL_ONE);
-		glDepthMask(false);
-		glDepthFunc(GL_EQUAL);
-		for (Light light : lights) {
-			
-			if(light.isEnabeld()){
-				light.updateLight(cam);
-//					for (Model model : models) {
-////						light.renderModel(model);
-//				}
-			}
+		if(root==null){
+			root = new GUIComponent(true);
 		}
-		sky.render(cam);
-		glDepthFunc(GL_LESS);
-		glDepthMask(true);
-		glDisable(GL_BLEND);
+		createShadowMaps(lights, models);
+		renderScene(cam, models, ambientLight, lights,sky);
+		
+		finalRender();
 		
 	}
 	public GUIComponent getRoot() {
@@ -125,10 +108,7 @@ public class RenderEngine {
 	}
 	public void addEffect(Efect efect) {
 		efects.add(efect);
-	}
-	
-	
-	
+	}	
 	public void cleanUp(){
 		for(String name : shaders.keySet())
 			getShader(name).deleteShader();;
@@ -234,6 +214,53 @@ public class RenderEngine {
 		}
 		glDepthFunc(GL_LESS);
 		glDepthMask(true);
+		glDisable(GL_DEPTH_TEST);
+		glDisable(GL_BLEND);
+		buffer1.unbindFrambuffer();
+		
+	}
+	
+	private void renderScene(Camera cam,List<Model> models,AmbientLight ambientLight,List<Light> lights,SkyBox sky){
+		//Framebuffer binden.
+		buffer1.bindAsRenderTarget();
+		
+		//Den Framebuffer lehren und das Rendern Forbereiten
+		GLUtil.setClearColor(0, 0, 0);
+		GLUtil.clearScreen();
+		GL11.glPolygonMode(GL_FRONT, GL_FILL);
+		glDisable(GL_CULL_FACE);
+		sky.render(cam);
+		glEnable(GL_CULL_FACE);
+		glCullFace(GL_BACK);
+		
+		//Szene mit ambienten Licht rendern darbei wird der Depthtest durchgeführt.
+		ambientLight.updateLight(cam);
+		for (Model model : models) {
+			ambientLight.renderModel(model,Models.getEntitys(model.getModelID()));
+		}
+		
+		//Rendereinstellungen für die Lichter vorbereiten und nur Fragments mit gleichem Z-Wert wie im Depthbuffer rendern.
+		//Dies sorgt dafür, dass nur sichtbare flächen gerendert werden und somit viel zeit für die Lichtberechnung eingespart wird.
+		//Durch das addieren der neuen farbe auf den Ausgenswert wird das endgültige Bild erzeugt.
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_ONE, GL_ONE);
+		glDepthMask(false);
+		glDepthFunc(GL_EQUAL);
+		for (Light light : lights) {
+			
+			if(light.isEnabeld()){
+				
+				for (Model model : models) {
+					light.updateLight(cam);
+					light.renderModel(model,Models.getEntitys(model.getModelID()));
+				}
+			}
+		}
+		
+		glDepthFunc(GL_LESS);
+		
+		glDepthMask(true);
+		
 		glDisable(GL_DEPTH_TEST);
 		glDisable(GL_BLEND);
 		buffer1.unbindFrambuffer();

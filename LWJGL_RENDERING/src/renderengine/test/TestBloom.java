@@ -5,6 +5,7 @@ import renderengine.core.Entity;
 import renderengine.core.FlyCamera;
 import renderengine.core.MainApplication;
 import renderengine.core.Transformation;
+import renderengine.core.Window;
 import renderengine.efects.BloomEfect;
 import renderengine.efects.FXAAEfect;
 import renderengine.input.Mouse;
@@ -12,6 +13,7 @@ import renderengine.light.PointLight;
 import renderengine.light.SpotLight;
 import renderengine.model.Model;
 import renderengine.model.OBJLoader;
+import renderengine.model.SkyBox;
 
 public class TestBloom extends MainApplication{
 
@@ -37,7 +39,7 @@ public class TestBloom extends MainApplication{
 	
 	@Override
 	protected void initApp() {
-		
+		Window.setFPS(10000);
 		cam = new FlyCamera(getW(), getH());
 		
 		Model affe = OBJLoader.loadOBJ("res/models/affe.obj");
@@ -48,6 +50,14 @@ public class TestBloom extends MainApplication{
 		this.affe.getMat().setSpecularExponent(128);
 		this.affe.getMat().setSpecularIntensity(10);
 		p = new PointLight(new Color(1f,1,1), 3, 10, -20, 1, 0, 0);
+		sky = new SkyBox(300, new String[]{
+				"res/textures/right.png",
+				"res/textures/left.png",
+				"res/textures/top.png",
+				"res/textures/bottom.png",
+				"res/textures/back.png",
+				"res/textures/front.png",
+		});
 		new BloomEfect(true);
 		new FXAAEfect(true);
 	}

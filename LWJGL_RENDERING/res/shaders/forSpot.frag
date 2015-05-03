@@ -12,6 +12,7 @@ uniform vec3 lightPos;
 uniform vec3 attenuation;
 uniform float specularInt;
 uniform float specularExp;
+uniform float minShadowInt;
 uniform vec3 camPos;
 uniform sampler2D textureSampler;
 uniform float range;
@@ -46,7 +47,7 @@ void main(void){
 	vec3 lightDir = normalize(worldPos-lightPos);
 	float spotFactor = dot(lightDir,spotDir);
 	vec3 diffuseColor = vec3(0,0,0);
-	float shadowInt = 0.5;
+	float shadowInt = minShadowInt;
 	if(spotFactor > cutoff){
 		vec3 toLightDir = lightPos - worldPos;
 		float distanceToLight = length(toLightDir);
@@ -67,7 +68,9 @@ void main(void){
 				specColor = lightInt*specularInt*specFactor;
 			}
 			diffuseColor = ((diffuseColor+specColor)/attenuationInt) * (1.0 - (1.0 - spotFactor) / (1.0 - cutoff));
-			shadowInt = calcShadow(shadowMap,shadowCoord);
+			if(minShadowInt<1){
+				shadowInt = calcShadow(shadowMap,shadowCoord);
+			}
 		}
 	}
 	

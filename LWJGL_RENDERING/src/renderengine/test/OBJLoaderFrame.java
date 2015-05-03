@@ -26,8 +26,8 @@ public class OBJLoaderFrame extends javax.swing.JFrame {
     public boolean updateModel = false;
     public boolean updateTexture = false;
     private Color lightC,modelC;
-    private String modelFile = "";
-    private String textureFile = "";
+    private String modelFile = "res/models/";
+    private String textureFile = "res/textures";
     /**
      * Creates new form NewJFrame
      */
@@ -77,7 +77,7 @@ public class OBJLoaderFrame extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setBounds(new java.awt.Rectangle(0, 0, 1280, 800));
-
+        setTitle("Renderengine Objloader Test: res/models/tardisMain.obj");
         renderCanvas.setBackground(new java.awt.Color(255, 0, 0));
         renderCanvas.setMaximumSize(new java.awt.Dimension(900, 698));
         renderCanvas.setMinimumSize(new java.awt.Dimension(900, 698));
@@ -294,6 +294,7 @@ public class OBJLoaderFrame extends javax.swing.JFrame {
         });
         if(fileC.showOpenDialog(this)==0){
             modelFile = fileC.getSelectedFile().getAbsolutePath();
+            setTitle("Renderengine Objloader Test: " + modelFile);
             updateModel = true;
         };
         

@@ -40,7 +40,7 @@ public class OBJLoader {
 					vertPos.add(vertex);
 				}else if(line.startsWith("vt ")){
 					String[] uvs = line.split(" ");
-					Vector2f uv = new Vector2f(Float.valueOf(uvs[1]), Float.valueOf(uvs[2]));
+					Vector2f uv = new Vector2f(Float.valueOf(uvs[2]), Float.valueOf(uvs[1]));
 					vertUV.add(uv);
  				}else if(line.startsWith("vn ")){
 					String[] normalDir = line.split(" ");
